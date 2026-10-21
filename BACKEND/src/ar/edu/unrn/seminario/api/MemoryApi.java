@@ -1,7 +1,12 @@
 package ar.edu.unrn.seminario.api;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import ar.edu.unrn.seminario.dto.RolDTO;
 import ar.edu.unrn.seminario.dto.UsuarioDTO;
@@ -11,8 +16,9 @@ import ar.edu.unrn.seminario.modelo.Usuario;
 
 public class MemoryApi implements IApi {
 
-	private ArrayList<Rol> roles = new ArrayList();
-	private ArrayList<Usuario> usuarios = new ArrayList<>();
+	private Set<Rol> roles = new TreeSet();
+	private List<Usuario> usuarios = new ArrayList<>();
+	private Map<String, String> usuariosRegistrados = new HashMap<String, String>();
 
 	public MemoryApi() {
 
@@ -32,8 +38,6 @@ public class MemoryApi implements IApi {
 		} catch (Exception e) {
 			System.out.println(e);
 		}
-		
-
 	}
 
 	@Override
@@ -41,6 +45,7 @@ public class MemoryApi implements IApi {
 
 		Rol role = this.buscarRol(rol);
 		Usuario usuario = new Usuario(username, password, email, role);
+		usuariosRegistrados.put(usuario.getUsuario(), usuario.getContrasena());
 		this.usuarios.add(usuario);
 
 	}
@@ -136,5 +141,12 @@ public class MemoryApi implements IApi {
 				return user;
 		}
 		return null;
+	}
+	
+	public boolean autenticar(String username, String password) {
+		if (usuariosRegistrados.containsKey(username) && usuariosRegistrados.get(username) == password) {
+			return true;
+		}
+		return false;
 	}
 }
