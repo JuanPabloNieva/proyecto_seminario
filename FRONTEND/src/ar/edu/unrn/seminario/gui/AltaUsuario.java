@@ -23,7 +23,6 @@ public class AltaUsuario extends JFrame {
 	private JPanel contentPane;
 	private JTextField usuarioTextField;
 	private JTextField contrasenaTextField;
-	private JTextField nombreTextField;
 	private JTextField emailTextField;
 	private JComboBox rolComboBox;
 
@@ -71,8 +70,7 @@ public class AltaUsuario extends JFrame {
 				RolDTO rol = roles.get(rolComboBox.getSelectedIndex());
 
 						try {
-							api.registrarUsuario(usuarioTextField.getText(), contrasenaTextField.getText(),
-									nombreTextField.getText(), emailTextField.getText(), rol.getCodigo());
+							api.registrarUsuario(usuarioTextField.getText(), contrasenaTextField.getText(), emailTextField.getText(), rol.getCodigo());
 							JOptionPane.showMessageDialog(null, "Usuario registrado con exito!", "Info", JOptionPane.INFORMATION_MESSAGE);
 							setVisible(false);
 							dispose();
@@ -108,11 +106,6 @@ public class AltaUsuario extends JFrame {
 		JLabel rolLabel = new JLabel("Rol:");
 		rolLabel.setBounds(43, 154, 56, 16);
 		contentPane.add(rolLabel);
-
-		nombreTextField = new JTextField();
-		nombreTextField.setBounds(148, 85, 160, 22);
-		contentPane.add(nombreTextField);
-		nombreTextField.setColumns(10);
 
 		emailTextField = new JTextField();
 		emailTextField.setBounds(148, 122, 160, 22);

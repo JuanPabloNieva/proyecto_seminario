@@ -8,7 +8,7 @@ import ar.edu.unrn.seminario.exception.DataEmptyException;
 
 public interface IApi {
 
-	void registrarUsuario(String username, String password, String email, String nombre, Integer rol) throws DataEmptyException ;
+	void registrarUsuario(String username, String password, String email, Integer rol) throws DataEmptyException ;
 
 	UsuarioDTO obtenerUsuario(String username);
 

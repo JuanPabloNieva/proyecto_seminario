@@ -5,12 +5,11 @@ import ar.edu.unrn.seminario.exception.DataEmptyException;
 public class Usuario {
 	private String usuario;
 	private String contrasena;
-	private String nombre;
 	private String email;
 	private Rol rol;
 	private boolean activo;
 
-	public Usuario(String usuario, String contrasena, String nombre, String email, Rol rol) throws DataEmptyException {
+	public Usuario(String usuario, String contrasena, String email, Rol rol) throws DataEmptyException {
 
 		if (usuario == null) {
 			System.out.println("usuario no puede ser nulo");
@@ -21,7 +20,6 @@ public class Usuario {
 
 		this.usuario = usuario;
 		this.contrasena = contrasena;
-		this.nombre = nombre;
 		this.email = email;
 		this.rol = rol;
 	}
@@ -48,13 +46,6 @@ public class Usuario {
 		this.contrasena = contrasena;
 	}
 
-	public String getNombre() {
-		return nombre;
-	}
-
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
-	}
 
 	public String getEmail() {
 		return email;

@@ -46,7 +46,7 @@ public class ListadoUsuario extends JFrame {
 		contentPane.add(scrollPane, BorderLayout.CENTER);
 
 		table = new JTable();
-		String[] titulos = { "USUARIO", "NOMBRE", "EMAIL", "ESTADO", "ROL" };
+		String[] titulos = { "USUARIO", "EMAIL", "ESTADO", "ROL" };
 
 		table.addMouseListener(new MouseAdapter() {
 			@Override
@@ -62,7 +62,7 @@ public class ListadoUsuario extends JFrame {
 		List<UsuarioDTO> usuarios = api.obtenerUsuarios();
 		// Agrega los usuarios en el model
 		for (UsuarioDTO u : usuarios) {
-			modelo.addRow(new Object[] { u.getUsername(), u.getNombre(), u.getEmail(), u.getEstado(), u.getRol() });
+			modelo.addRow(new Object[] { u.getUsername(), u.getEmail(), u.getEstado(), u.getRol() });
 		}
 
 		table.setModel(modelo);
@@ -139,7 +139,7 @@ public class ListadoUsuario extends JFrame {
 
 		// Agrega los usuarios en el model
 		for (UsuarioDTO u : usuarios) {
-			modelo.addRow(new Object[] { u.getUsername(), u.getNombre(), u.getEmail(), u.getEstado(), u.getRol() });
+			modelo.addRow(new Object[] { u.getUsername(), u.getEmail(), u.getEstado(), u.getRol() });
 		}
 
 	}

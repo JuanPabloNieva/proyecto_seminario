@@ -26,9 +26,9 @@ public class MemoryApi implements IApi {
 	private void inicializarUsuarios() {
 		
 		try {
-			registrarUsuario("admin", "1234", "admin@unrn.edu.ar", "Admin", 1);
-			registrarUsuario("ldifabio", "4", "ldifabio@unrn.edu.ar", "Lucas", 2);
-			registrarUsuario("bjgorosito", "1234", "bjgorosito@unrn.edu.ar", "Bruno", 3);
+			registrarUsuario("admin", "1234", "admin@unrn.edu.ar", 1);
+			registrarUsuario("ldifabio", "4", "ldifabio@unrn.edu.ar", 2);
+			registrarUsuario("bjgorosito", "1234", "bjgorosito@unrn.edu.ar", 3);
 		} catch (Exception e) {
 			System.out.println(e);
 		}
@@ -37,10 +37,10 @@ public class MemoryApi implements IApi {
 	}
 
 	@Override
-	public void registrarUsuario(String username, String password, String email, String nombre, Integer rol) throws DataEmptyException {
+	public void registrarUsuario(String username, String password, String email, Integer rol) throws DataEmptyException {
 
 		Rol role = this.buscarRol(rol);
-		Usuario usuario = new Usuario(username, password, nombre, email, role);
+		Usuario usuario = new Usuario(username, password, email, role);
 		this.usuarios.add(usuario);
 
 	}
@@ -49,7 +49,7 @@ public class MemoryApi implements IApi {
 	public List<UsuarioDTO> obtenerUsuarios() {
 		List<UsuarioDTO> dtos = new ArrayList<>();
 		for (Usuario u : this.usuarios) {
-			dtos.add(new UsuarioDTO(u.getUsuario(), u.getContrasena(), u.getNombre(), u.getEmail(),
+			dtos.add(new UsuarioDTO(u.getUsuario(), u.getContrasena(), u.getEmail(),
 					u.getRol().getNombre(), u.isActivo(), u.obtenerEstado()));
 		}
 		return dtos;
