@@ -2,8 +2,10 @@ package ar.edu.unrn.seminario.api;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -16,7 +18,7 @@ import ar.edu.unrn.seminario.modelo.Usuario;
 
 public class MemoryApi implements IApi {
 
-	private Set<Rol> roles = new TreeSet();
+	private Set<Rol> roles = new HashSet();
 	private List<Usuario> usuarios = new ArrayList<>();
 	private Map<String, String> usuariosRegistrados = new HashMap<String, String>();
 
@@ -144,9 +146,13 @@ public class MemoryApi implements IApi {
 	}
 	
 	public boolean autenticar(String username, String password) {
-		if (usuariosRegistrados.containsKey(username) && usuariosRegistrados.get(username) == password) {
+		if (username.equals("")) {
+			return false;
+		} else if (usuariosRegistrados.containsKey(username) && usuariosRegistrados.get(username).equals(password)) {
 			return true;
+		} else {
+			return false;
 		}
-		return false;
+		
 	}
 }
