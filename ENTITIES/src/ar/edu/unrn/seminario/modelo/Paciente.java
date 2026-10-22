@@ -17,4 +17,22 @@ public class Paciente extends Persona{
 		this(nombre, apellido, dni, obraSocial);
 		this.historiaClinica.add(turno);
 	}
+
+	public String getObraSocial() {
+		return obraSocial;
+	}
+
+	public void setObraSocial(String obraSocial) {
+		this.obraSocial = obraSocial;
+	}
+
+	public List<Turno> getHistoriaClinica() {
+		return historiaClinica;
+	}
+
+	public void setHistoriaClinica(List<Turno> historiaClinica) {
+		this.historiaClinica = historiaClinica;
+	}
+	
+	
 }
