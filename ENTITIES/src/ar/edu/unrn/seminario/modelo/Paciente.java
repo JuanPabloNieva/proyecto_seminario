@@ -17,13 +17,14 @@ public class Paciente extends Persona{
 		validarCampoVacio(String.valueOf(dni), "Dni");
 		
 		this.obraSocial = obraSocial;
-		this.historiaClinica = new ArrayList<Turno>();
+		this.historiaClinica = new ArrayList<>();
 	}
 	
-	public Paciente(String nombre, String apellido, int dni, ObraSocial obraSocial, Turno turno) throws DataEmptyException {
+	
+	/*public Paciente(String nombre, String apellido, int dni, ObraSocial obraSocial, Turno turno) throws DataEmptyException {
 		this(nombre, apellido, dni, obraSocial);
 		this.historiaClinica.add(turno);
-	}
+	}*/
 	
 	private void validarCampoVacio(String valorCampo, String nombreCampo) throws DataEmptyException {
 		if (valorCampo.equals("")) {

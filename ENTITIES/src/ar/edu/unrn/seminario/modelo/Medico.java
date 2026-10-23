@@ -15,6 +15,10 @@ public class Medico extends Persona{
 		this.especialidad = especialidad;
 		this.matricula = matricula;
 	}
+	
+	private void inicializarTurnosDisponibles() {
+		
+	}
 
 	public Usuario getUsuario() {
 		return usuario;
