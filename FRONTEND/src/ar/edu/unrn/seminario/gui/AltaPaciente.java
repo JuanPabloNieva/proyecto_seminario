@@ -4,6 +4,7 @@ import javax.swing.JPanel;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
+import java.awt.CardLayout;
 import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,7 @@ import ar.edu.unrn.seminario.api.IApi;
 import ar.edu.unrn.seminario.dto.ObraSocialDTO;
 import ar.edu.unrn.seminario.dto.RolDTO;
 import ar.edu.unrn.seminario.exception.DataEmptyException;
+import ar.edu.unrn.seminario.exception.DniErroneoException;
 
 import javax.swing.JComboBox;
 import javax.swing.JButton;
@@ -26,13 +28,14 @@ public class AltaPaciente extends JPanel {
 	private JTextField tfNombre;
 	private JTextField tfApellido;
 	private JTextField tfDni;
+	private JComboBox<String> cbObraSocial;
 	
 	private List<ObraSocialDTO> obrasSociales = new ArrayList<>();
 
 	/**
 	 * Create the panel.
 	 */
-	public AltaPaciente(IApi api) {
+	public AltaPaciente(IApi api, JPanel panelContenedor, CardLayout cardLayout) {
 		setLayout(null);
 		
 		this.obrasSociales = api.obtenerObrasSociales();
@@ -72,7 +75,7 @@ public class AltaPaciente extends JPanel {
 		lblObraSocial.setBounds(69, 144, 75, 25);
 		add(lblObraSocial);
 		
-		JComboBox<String> cbObraSocial = new JComboBox<String>();
+		cbObraSocial = new JComboBox<String>();
 		cbObraSocial.setBounds(154, 144, 158, 25);
 		add(cbObraSocial);
 		
@@ -86,10 +89,26 @@ public class AltaPaciente extends JPanel {
 				ObraSocialDTO oSocial = obrasSociales.get(cbObraSocial.getSelectedIndex());
 
 				try {
-					api.registrarPaciente(tfNombre.getText(), tfApellido.getText(), Integer.parseInt(tfDni.getText()), oSocial.getCodigo());
+					String nombre = tfNombre.getText().trim();
+        	        String apellido = tfApellido.getText().trim();
+        	        String dniTxt = tfDni.getText().trim();
+        	        int dni;
+        	        
+        	        if (dniTxt.matches("^\\d{7,8}$")) {
+						dni = Integer.parseInt(dniTxt);
+					} else {
+						throw new DniErroneoException("El dni no tiene un formato correcto. Ingrese numeros sin puntos");
+					}
+        	        
+        	        api.registrarPaciente(nombre, apellido, dni, oSocial.getCodigo());
+        	        limpiarCampos();
 					JOptionPane.showMessageDialog(null, "Paciente registrado con exito!", "Info", JOptionPane.INFORMATION_MESSAGE);
+					cardLayout.show(panelContenedor, "PANELDEFAULT");
+					
 				} catch (DataEmptyException ex) {
 					JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+				} catch (DniErroneoException dnie) {
+					JOptionPane.showMessageDialog(null, dnie.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
@@ -101,5 +120,10 @@ public class AltaPaciente extends JPanel {
 		add(btnCancelar);
 
 	}
-
+	
+	private void limpiarCampos() {
+		tfNombre.setText("");
+		tfApellido.setText("");
+		tfDni.setText("");
+	}
 }

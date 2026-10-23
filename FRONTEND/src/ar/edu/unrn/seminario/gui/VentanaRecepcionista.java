@@ -66,7 +66,7 @@ public class VentanaRecepcionista extends JFrame {
 		
 		// Instanciar paneles
 		
-		JPanel panelAltaPaciente = new AltaPaciente(api);
+		JPanel panelAltaPaciente = new AltaPaciente(api, panelContenedor, cardLayout);
 		JPanel panelListadoPacientes = new ListadoPaciente();
 		JPanel panelDefault = new PanelRecepcionistaDefault();
 		
