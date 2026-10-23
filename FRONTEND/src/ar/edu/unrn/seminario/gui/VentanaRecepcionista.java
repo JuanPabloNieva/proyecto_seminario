@@ -53,7 +53,7 @@ public class VentanaRecepcionista extends JFrame {
 		
 		setTitle("SISTEMA SALUD - Recepcionista");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 450, 300);
+		setBounds(100, 100, 700, 550);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -68,9 +68,11 @@ public class VentanaRecepcionista extends JFrame {
 		
 		JPanel panelAltaPaciente = new AltaPaciente(api);
 		JPanel panelListadoPacientes = new ListadoPaciente();
+		JPanel panelDefault = new PanelRecepcionistaDefault();
 		
 		// Agregarlos al panel contenedor con un nombre clave (identificador)
 		
+		panelContenedor.add(panelDefault, "PANELDEFAULT");
 		panelContenedor.add(panelAltaPaciente, "ALTAPACIENTE");
 		panelContenedor.add(panelListadoPacientes, "LISTADOPACIENTE");
 		
