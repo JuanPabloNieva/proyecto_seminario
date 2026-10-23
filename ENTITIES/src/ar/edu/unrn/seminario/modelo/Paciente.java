@@ -3,19 +3,32 @@ package ar.edu.unrn.seminario.modelo;
 import java.util.ArrayList;
 import java.util.List;
 
+import ar.edu.unrn.seminario.exception.DataEmptyException;
+
 public class Paciente extends Persona{
 	private ObraSocial obraSocial;
 	private List<Turno> historiaClinica;
 	
-	public Paciente(String nombre, String apellido, int dni, ObraSocial obraSocial) {
+	public Paciente(String nombre, String apellido, int dni, ObraSocial obraSocial) throws DataEmptyException {
 		super(nombre, apellido, dni);
+		
+		validarCampoVacio(nombre, "Nombre");
+		validarCampoVacio(apellido, "Apellido");
+		validarCampoVacio(String.valueOf(dni), "Dni");
+		
 		this.obraSocial = obraSocial;
 		this.historiaClinica = new ArrayList<Turno>();
 	}
 	
-	public Paciente(String nombre, String apellido, int dni, ObraSocial obraSocial, Turno turno) {
+	public Paciente(String nombre, String apellido, int dni, ObraSocial obraSocial, Turno turno) throws DataEmptyException {
 		this(nombre, apellido, dni, obraSocial);
 		this.historiaClinica.add(turno);
+	}
+	
+	private void validarCampoVacio(String valorCampo, String nombreCampo) throws DataEmptyException {
+		if (valorCampo.equals("")) {
+			throw new DataEmptyException("el campo " + nombreCampo + " no puede ser vacio");
+		}
 	}
 
 	public ObraSocial getObraSocial() {

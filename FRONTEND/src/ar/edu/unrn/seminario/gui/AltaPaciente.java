@@ -29,7 +29,7 @@ public class AltaPaciente extends JPanel {
 	private JTextField tfApellido;
 	private JTextField tfDni;
 	private JComboBox<String> cbObraSocial;
-	
+
 	private List<ObraSocialDTO> obrasSociales = new ArrayList<>();
 
 	/**
@@ -37,52 +37,52 @@ public class AltaPaciente extends JPanel {
 	 */
 	public AltaPaciente(IApi api, JPanel panelContenedor, CardLayout cardLayout) {
 		setLayout(null);
-		
+
 		this.obrasSociales = api.obtenerObrasSociales();
-		
+
 		JLabel lblNombre = new JLabel("Nombre:");
 		lblNombre.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		lblNombre.setBounds(69, 36, 75, 25);
 		add(lblNombre);
-		
+
 		tfNombre = new JTextField();
 		tfNombre.setColumns(10);
 		tfNombre.setBounds(154, 40, 158, 20);
 		add(tfNombre);
-		
+
 		JLabel lblApellido = new JLabel("Apellido:");
 		lblApellido.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		lblApellido.setBounds(69, 72, 75, 25);
 		add(lblApellido);
-		
+
 		tfApellido = new JTextField();
 		tfApellido.setColumns(10);
 		tfApellido.setBounds(154, 76, 158, 20);
 		add(tfApellido);
-		
+
 		JLabel lblDNI = new JLabel("DNI:");
 		lblDNI.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		lblDNI.setBounds(69, 108, 75, 25);
 		add(lblDNI);
-		
+
 		tfDni = new JTextField();
 		tfDni.setColumns(10);
 		tfDni.setBounds(154, 112, 158, 20);
 		add(tfDni);
-		
+
 		JLabel lblObraSocial = new JLabel("Obra social:");
 		lblObraSocial.setFont(new Font("Tahoma", Font.PLAIN, 14));
 		lblObraSocial.setBounds(69, 144, 75, 25);
 		add(lblObraSocial);
-		
+
 		cbObraSocial = new JComboBox<String>();
 		cbObraSocial.setBounds(154, 144, 158, 25);
 		add(cbObraSocial);
-		
+
 		for (ObraSocialDTO os : this.obrasSociales) {
 			cbObraSocial.addItem(os.getNombre());
 		}
-		
+
 		JButton btnAceptar = new JButton("Aceptar");
 		btnAceptar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -90,21 +90,23 @@ public class AltaPaciente extends JPanel {
 
 				try {
 					String nombre = tfNombre.getText().trim();
-        	        String apellido = tfApellido.getText().trim();
-        	        String dniTxt = tfDni.getText().trim();
-        	        int dni;
-        	        
-        	        if (dniTxt.matches("^\\d{7,8}$")) {
+					String apellido = tfApellido.getText().trim();
+					String dniTxt = tfDni.getText().trim();
+					int dni;
+
+					if (dniTxt.matches("^\\d{7,8}$")) {
 						dni = Integer.parseInt(dniTxt);
 					} else {
-						throw new DniErroneoException("El dni no tiene un formato correcto. Ingrese numeros sin puntos");
+						throw new DniErroneoException(
+								"El dni no tiene un formato correcto. Ingrese numeros sin puntos");
 					}
-        	        
-        	        api.registrarPaciente(nombre, apellido, dni, oSocial.getCodigo());
-        	        limpiarCampos();
-					JOptionPane.showMessageDialog(null, "Paciente registrado con exito!", "Info", JOptionPane.INFORMATION_MESSAGE);
+
+					api.registrarPaciente(nombre, apellido, dni, oSocial.getCodigo());
+					limpiarCampos();
+					JOptionPane.showMessageDialog(null, "Paciente registrado con exito!", "Info",
+							JOptionPane.INFORMATION_MESSAGE);
 					cardLayout.show(panelContenedor, "PANELDEFAULT");
-					
+
 				} catch (DataEmptyException ex) {
 					JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 				} catch (DniErroneoException dnie) {
@@ -114,13 +116,19 @@ public class AltaPaciente extends JPanel {
 		});
 		btnAceptar.setBounds(178, 217, 89, 23);
 		add(btnAceptar);
-		
+
 		JButton btnCancelar = new JButton("Cancelar");
+		btnCancelar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				limpiarCampos();
+				cardLayout.show(panelContenedor, "PANELDEFAULT");
+			}
+		});
 		btnCancelar.setBounds(277, 217, 89, 23);
 		add(btnCancelar);
 
 	}
-	
+
 	private void limpiarCampos() {
 		tfNombre.setText("");
 		tfApellido.setText("");
