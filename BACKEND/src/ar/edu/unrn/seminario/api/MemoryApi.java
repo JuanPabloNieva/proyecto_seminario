@@ -18,6 +18,7 @@ import ar.edu.unrn.seminario.exception.DataEmptyException;
 import ar.edu.unrn.seminario.modelo.Especialidad;
 import ar.edu.unrn.seminario.modelo.Medico;
 import ar.edu.unrn.seminario.modelo.ObraSocial;
+import ar.edu.unrn.seminario.modelo.Paciente;
 import ar.edu.unrn.seminario.modelo.Rol;
 import ar.edu.unrn.seminario.modelo.Usuario;
 
@@ -36,7 +37,7 @@ public class MemoryApi implements IApi {
 		this.roles.add(new Rol(1, "ADMIN"));
 		this.roles.add(new Rol(2, "RECEPCIONISTA"));
 		this.roles.add(new Rol(3, "MEDICO"));
-		
+
 		this.oSociales.add(new ObraSocial(1, "IPROSS"));
 		this.oSociales.add(new ObraSocial(2, "OSDE"));
 		this.oSociales.add(new ObraSocial(3, "SANCORSALUD"));
@@ -81,11 +82,18 @@ public class MemoryApi implements IApi {
 	}
 
 	@Override
-	public void registrarMedico(String nombre, String apellido, int dni, String matricula, int especialidad, Usuario usuario)
-			throws DataEmptyException {
+	public void registrarMedico(String nombre, String apellido, int dni, String matricula, int especialidad,
+			Usuario usuario) throws DataEmptyException {
 		Especialidad espec = this.buscarEspecialidad(especialidad);
 		Medico medico = new Medico(nombre, apellido, dni, matricula, espec);
 		medico.setUsuario(usuario);
+	}
+
+	@Override
+	public void registrarPaciente(String nombre, String apellido, int dni, Integer obraSocial)
+			throws DataEmptyException {
+		ObraSocial os = this.buscarObraSocial(obraSocial);
+		Paciente paciente = new Paciente(nombre, apellido, dni, os);
 	}
 
 	@Override
@@ -97,7 +105,7 @@ public class MemoryApi implements IApi {
 		}
 		return dtos;
 	}
-	
+
 	@Override
 	public List<ObraSocialDTO> obtenerObrasSociales() {
 		List<ObraSocialDTO> dtos = new ArrayList<>();
@@ -204,6 +212,14 @@ public class MemoryApi implements IApi {
 		for (Usuario user : usuarios) {
 			if (user.getUsuario().equals(usuario))
 				return user;
+		}
+		return null;
+	}
+	
+	private ObraSocial buscarObraSocial(Integer obraSocial) {
+		for (ObraSocial os : oSociales) {
+			if (os.getCodigo().equals(obraSocial))
+				return os;
 		}
 		return null;
 	}
