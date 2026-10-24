@@ -4,6 +4,7 @@ import java.util.List;
 
 import ar.edu.unrn.seminario.dto.MedicoDTO;
 import ar.edu.unrn.seminario.dto.ObraSocialDTO;
+import ar.edu.unrn.seminario.dto.PacienteDTO;
 import ar.edu.unrn.seminario.dto.RolDTO;
 import ar.edu.unrn.seminario.dto.UsuarioDTO;
 import ar.edu.unrn.seminario.exception.DataEmptyException;
@@ -21,6 +22,8 @@ public interface IApi {
 	UsuarioDTO obtenerUsuario(String username);
 
 	void eliminarUsuario(String username);
+	
+	void eliminarPaciente(String dniPaciente);
 
 	List<RolDTO> obtenerRoles();
 	
@@ -34,11 +37,15 @@ public interface IApi {
 
 	RolDTO obtenerRolPorCodigo(Integer codigo); // recuperar el rol almacenado
 
+	PacienteDTO obtenerPacientePorDni(String dniPaciente);
+	
 	void activarRol(Integer codigo); // recuperar el objeto Rol, implementar el comportamiento de estado.
 
 	void desactivarRol(Integer codigo); // recuperar el objeto Rol, imp
 
 	List<UsuarioDTO> obtenerUsuarios(); // recuperar todos los usuarios
+	
+	List<PacienteDTO> obtenerPacientes();
 
 	void activarUsuario(String username); // recuperar el objeto Usuario, implementar el comportamiento de estado.
 

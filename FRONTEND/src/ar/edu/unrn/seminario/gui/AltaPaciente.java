@@ -42,49 +42,49 @@ public class AltaPaciente extends JPanel {
 
 		JLabel lblNombre = new JLabel("Nombre:");
 		lblNombre.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		lblNombre.setBounds(69, 36, 75, 25);
+		lblNombre.setBounds(213, 156, 75, 25);
 		add(lblNombre);
 
 		tfNombre = new JTextField();
 		tfNombre.setColumns(10);
-		tfNombre.setBounds(154, 40, 158, 20);
+		tfNombre.setBounds(298, 160, 158, 20);
 		add(tfNombre);
 
 		JLabel lblApellido = new JLabel("Apellido:");
 		lblApellido.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		lblApellido.setBounds(69, 72, 75, 25);
+		lblApellido.setBounds(213, 192, 75, 25);
 		add(lblApellido);
 
 		tfApellido = new JTextField();
 		tfApellido.setColumns(10);
-		tfApellido.setBounds(154, 76, 158, 20);
+		tfApellido.setBounds(298, 196, 158, 20);
 		add(tfApellido);
 
 		JLabel lblDNI = new JLabel("DNI:");
 		lblDNI.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		lblDNI.setBounds(69, 108, 75, 25);
+		lblDNI.setBounds(213, 228, 75, 25);
 		add(lblDNI);
 
 		tfDni = new JTextField();
 		tfDni.setColumns(10);
-		tfDni.setBounds(154, 112, 158, 20);
+		tfDni.setBounds(298, 232, 158, 20);
 		add(tfDni);
 
 		JLabel lblObraSocial = new JLabel("Obra social:");
 		lblObraSocial.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		lblObraSocial.setBounds(69, 144, 75, 25);
+		lblObraSocial.setBounds(213, 264, 75, 25);
 		add(lblObraSocial);
 
 		cbObraSocial = new JComboBox<String>();
-		cbObraSocial.setBounds(154, 144, 158, 25);
+		cbObraSocial.setBounds(298, 264, 158, 25);
 		add(cbObraSocial);
 
 		for (ObraSocialDTO os : this.obrasSociales) {
 			cbObraSocial.addItem(os.getNombre());
 		}
 
-		JButton btnAceptar = new JButton("Aceptar");
-		btnAceptar.addActionListener(new ActionListener() {
+		JButton btnRegistrar = new JButton("Registrar");
+		btnRegistrar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				ObraSocialDTO oSocial = obrasSociales.get(cbObraSocial.getSelectedIndex());
 
@@ -114,8 +114,8 @@ public class AltaPaciente extends JPanel {
 				}
 			}
 		});
-		btnAceptar.setBounds(178, 217, 89, 23);
-		add(btnAceptar);
+		btnRegistrar.setBounds(322, 337, 89, 23);
+		add(btnRegistrar);
 
 		JButton btnCancelar = new JButton("Cancelar");
 		btnCancelar.addActionListener(new ActionListener() {
@@ -124,7 +124,7 @@ public class AltaPaciente extends JPanel {
 				cardLayout.show(panelContenedor, "PANELDEFAULT");
 			}
 		});
-		btnCancelar.setBounds(277, 217, 89, 23);
+		btnCancelar.setBounds(421, 337, 89, 23);
 		add(btnCancelar);
 
 	}

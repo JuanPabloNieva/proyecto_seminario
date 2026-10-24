@@ -8,6 +8,7 @@ import javax.swing.border.EmptyBorder;
 
 import ar.edu.unrn.seminario.api.IApi;
 import ar.edu.unrn.seminario.api.MemoryApi;
+import ar.edu.unrn.seminario.dto.PacienteDTO;
 
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
@@ -28,6 +29,11 @@ public class VentanaRecepcionista extends JFrame {
 	private JPanel contentPane;
 	private CardLayout cardLayout;
 	private JPanel panelContenedor;
+	
+	private AltaPaciente panelAltaPaciente;
+	private ListadoPaciente panelListadoPacientes;
+	private ModificarPaciente panelModificarPaciente;
+	private JPanel panelDefault;
 
 	/**
 	 * Launch the application.
@@ -66,14 +72,16 @@ public class VentanaRecepcionista extends JFrame {
 		
 		// Instanciar paneles
 		
-		JPanel panelAltaPaciente = new AltaPaciente(api, panelContenedor, cardLayout);
-		JPanel panelListadoPacientes = new ListadoPaciente();
-		JPanel panelDefault = new PanelRecepcionistaDefault();
+		panelAltaPaciente = new AltaPaciente(api, panelContenedor, cardLayout);
+		panelListadoPacientes = new ListadoPaciente(this, api, panelContenedor, cardLayout);
+		panelModificarPaciente = new ModificarPaciente(api, panelContenedor, cardLayout);
+		panelDefault = new PanelRecepcionistaDefault();
 		
 		// Agregarlos al panel contenedor con un nombre clave (identificador)
 		
 		panelContenedor.add(panelDefault, "PANELDEFAULT");
 		panelContenedor.add(panelAltaPaciente, "ALTAPACIENTE");
+		panelContenedor.add(panelModificarPaciente, "MODIFICARPACIENTE");
 		panelContenedor.add(panelListadoPacientes, "LISTADOPACIENTE");
 		
 		JMenuBar barraMenu = new JMenuBar();
@@ -85,7 +93,7 @@ public class VentanaRecepcionista extends JFrame {
 		JMenuItem opcionRegistrarPaciente = new JMenuItem("Registrar Paciente");
 		opcionRegistrarPaciente.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				cardLayout.show(panelContenedor, "ALTAPACIENTE");
+				mostrarListadoPacientes();
 			}
 		});
 		menuPacientes.add(opcionRegistrarPaciente);
@@ -113,5 +121,15 @@ public class VentanaRecepcionista extends JFrame {
 		JMenuItem opcionCerrarSesion = new JMenuItem("Cerrar Sesión");
 		menuConfiguracion.add(opcionCerrarSesion);		
 
+	}
+	
+	public void pasarPacienteAModificar(PacienteDTO paciente) {
+		this.panelModificarPaciente.datoPacienteActual(paciente);
+		cardLayout.show(panelContenedor, "MODIFICARPACIENTE");
+	}
+	
+	public void mostrarListadoPacientes() {
+		panelListadoPacientes.actualizarTabla();
+		cardLayout.show(panelContenedor, "ALTAPACIENTE");
 	}
 }

@@ -3,6 +3,7 @@ package ar.edu.unrn.seminario.dto;
 import java.util.ArrayList;
 import java.util.List;
 
+import ar.edu.unrn.seminario.modelo.ObraSocial;
 import ar.edu.unrn.seminario.modelo.Turno;
 
 public class PacienteDTO {
@@ -12,17 +13,12 @@ public class PacienteDTO {
 	private String obraSocial;
 	private List<Turno> historiaClinica;
 	
-	public PacienteDTO(String nombre, String apellido, int dni, String obraSocial) {
+	public PacienteDTO(String nombre, String apellido, int dni, String obraSocial, List<Turno> historiaClinica) {
 		this.nombre = nombre;
 		this.apellido = apellido;
 		this.dni = dni;
 		this.obraSocial = obraSocial;
-		this.historiaClinica = new ArrayList<Turno>();
-	}
-	
-	public PacienteDTO(String nombre, String apellido, int dni, String obraSocial, Turno turno) {
-		this(nombre, apellido, dni, obraSocial);
-		this.historiaClinica.add(turno);
+		this.historiaClinica = historiaClinica;
 	}
 
 	public String getNombre() {

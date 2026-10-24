@@ -9,9 +9,11 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 import ar.edu.unrn.seminario.dto.MedicoDTO;
 import ar.edu.unrn.seminario.dto.ObraSocialDTO;
+import ar.edu.unrn.seminario.dto.PacienteDTO;
 import ar.edu.unrn.seminario.dto.RolDTO;
 import ar.edu.unrn.seminario.dto.UsuarioDTO;
 import ar.edu.unrn.seminario.exception.DataEmptyException;
@@ -29,6 +31,7 @@ public class MemoryApi implements IApi {
 	private Set<Especialidad> especialidades = new HashSet();
 	private List<Usuario> usuarios = new ArrayList<>();
 	private List<Medico> medicos = new ArrayList<>();
+	private List<Paciente> pacientes = new ArrayList<>();
 	private Map<String, String> usuariosRegistrados = new HashMap<String, String>();
 
 	public MemoryApi() {
@@ -94,6 +97,7 @@ public class MemoryApi implements IApi {
 			throws DataEmptyException {
 		ObraSocial os = this.buscarObraSocial(obraSocial);
 		Paciente paciente = new Paciente(nombre, apellido, dni, os);
+		this.pacientes.add(paciente);
 	}
 
 	@Override
@@ -126,6 +130,17 @@ public class MemoryApi implements IApi {
 	}
 
 	@Override
+	public List<PacienteDTO> obtenerPacientes() {
+		List<PacienteDTO> dtos = new ArrayList<>();
+		for (Paciente p : this.pacientes) {
+			dtos.add(new PacienteDTO(p.getNombre(), p.getApellido(), p.getDni(), p.getObraSocial().getNombre(),
+					p.getHistoriaClinica()));
+		}
+
+		return dtos;
+	}
+
+	@Override
 	public UsuarioDTO obtenerUsuario(String username) {
 		// TODO Auto-generated method stub
 		return null;
@@ -135,6 +150,13 @@ public class MemoryApi implements IApi {
 	public void eliminarUsuario(String username) {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public void eliminarPaciente(String dniPaciente) {
+		int dni = Integer.parseInt(dniPaciente);
+		this.pacientes = this.pacientes.stream().filter(paciente -> !(paciente.getDni() == (dni)))
+				.collect(Collectors.toCollection(ArrayList::new));
 	}
 
 	@Override
@@ -167,6 +189,15 @@ public class MemoryApi implements IApi {
 	public RolDTO obtenerRolPorCodigo(Integer codigo) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public PacienteDTO obtenerPacientePorDni(String dniPaciente) {
+		int dni = Integer.parseInt(dniPaciente);
+		Paciente paciente = this.pacientes.stream().filter(p -> (p.getDni() == dni)).findFirst().orElse(null);
+		PacienteDTO pacienteDTO = new PacienteDTO(paciente.getNombre(), paciente.getApellido(), paciente.getDni(),
+				paciente.getObraSocial().getNombre(), paciente.getHistoriaClinica());
+		return pacienteDTO;
 	}
 
 	@Override
@@ -215,7 +246,7 @@ public class MemoryApi implements IApi {
 		}
 		return null;
 	}
-	
+
 	private ObraSocial buscarObraSocial(Integer obraSocial) {
 		for (ObraSocial os : oSociales) {
 			if (os.getCodigo().equals(obraSocial))
