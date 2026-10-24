@@ -2,13 +2,16 @@ package ar.edu.unrn.seminario.api;
 
 import java.util.List;
 
+import ar.edu.unrn.seminario.dto.EspecialidadDTO;
 import ar.edu.unrn.seminario.dto.MedicoDTO;
 import ar.edu.unrn.seminario.dto.ObraSocialDTO;
 import ar.edu.unrn.seminario.dto.PacienteDTO;
 import ar.edu.unrn.seminario.dto.RolDTO;
+import ar.edu.unrn.seminario.dto.TurnoDTO;
 import ar.edu.unrn.seminario.dto.UsuarioDTO;
 import ar.edu.unrn.seminario.exception.DataEmptyException;
 import ar.edu.unrn.seminario.modelo.Medico;
+import ar.edu.unrn.seminario.modelo.Paciente;
 import ar.edu.unrn.seminario.modelo.Usuario;
 
 public interface IApi {
@@ -34,12 +37,18 @@ public interface IApi {
 	List<MedicoDTO> obtenerMedicos();
 
 	List<RolDTO> obtenerRolesActivos();
+	
+	List<TurnoDTO> obtenerHistoriaClinica(Paciente paciente);
 
 	void guardarRol(Integer codigo, String descripcion, boolean estado); // crear el objeto de dominio �Rol�
 
 	RolDTO obtenerRolPorCodigo(Integer codigo); // recuperar el rol almacenado
 
-	PacienteDTO obtenerPacientePorDni(String dniPaciente);
+	PacienteDTO obtenerPacientePorDni(Integer dniPaciente);
+	
+	EspecialidadDTO obtenerEspecialidad(Integer codigo);
+	
+	MedicoDTO obtenerMedico(String matricula);
 	
 	void activarRol(Integer codigo); // recuperar el objeto Rol, implementar el comportamiento de estado.
 

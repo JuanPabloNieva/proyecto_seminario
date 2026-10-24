@@ -3,17 +3,14 @@ package ar.edu.unrn.seminario.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-import ar.edu.unrn.seminario.modelo.ObraSocial;
-import ar.edu.unrn.seminario.modelo.Turno;
-
 public class PacienteDTO {
 	private String nombre;
 	private String apellido;
 	private int dni;
 	private String obraSocial;
-	private List<Turno> historiaClinica;
+	private List<TurnoDTO> historiaClinica;
 	
-	public PacienteDTO(String nombre, String apellido, int dni, String obraSocial, List<Turno> historiaClinica) {
+	public PacienteDTO(String nombre, String apellido, int dni, String obraSocial, List<TurnoDTO> historiaClinica) {
 		this.nombre = nombre;
 		this.apellido = apellido;
 		this.dni = dni;
@@ -53,11 +50,11 @@ public class PacienteDTO {
 		this.obraSocial = obraSocial;
 	}
 
-	public List<Turno> getHistoriaClinica() {
+	public List<TurnoDTO> getHistoriaClinica() {
 		return historiaClinica;
 	}
 
-	public void setHistoriaClinica(List<Turno> historiaClinica) {
+	public void setHistoriaClinica(List<TurnoDTO> historiaClinica) {
 		this.historiaClinica = historiaClinica;
 	}
 	

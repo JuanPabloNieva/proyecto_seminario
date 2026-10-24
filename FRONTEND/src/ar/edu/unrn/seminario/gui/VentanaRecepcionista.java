@@ -33,6 +33,7 @@ public class VentanaRecepcionista extends JFrame {
 	private AltaPaciente panelAltaPaciente;
 	private ListadoPaciente panelListadoPacientes;
 	private ModificarPaciente panelModificarPaciente;
+	private HistoriaClinica panelHistoriaClinica;
 	private JPanel panelDefault;
 
 	/**
@@ -75,6 +76,7 @@ public class VentanaRecepcionista extends JFrame {
 		panelAltaPaciente = new AltaPaciente(api, panelContenedor, cardLayout);
 		panelListadoPacientes = new ListadoPaciente(this, api, panelContenedor, cardLayout);
 		panelModificarPaciente = new ModificarPaciente(api, panelContenedor, cardLayout);
+		panelHistoriaClinica = new HistoriaClinica(api, panelContenedor, cardLayout);
 		panelDefault = new PanelRecepcionistaDefault();
 		
 		// Agregarlos al panel contenedor con un nombre clave (identificador)
@@ -83,6 +85,7 @@ public class VentanaRecepcionista extends JFrame {
 		panelContenedor.add(panelAltaPaciente, "ALTAPACIENTE");
 		panelContenedor.add(panelModificarPaciente, "MODIFICARPACIENTE");
 		panelContenedor.add(panelListadoPacientes, "LISTADOPACIENTE");
+		panelContenedor.add(panelHistoriaClinica, "HISTORIACLINICA");
 		
 		JMenuBar barraMenu = new JMenuBar();
 		contentPane.add(barraMenu, BorderLayout.NORTH);
@@ -126,6 +129,11 @@ public class VentanaRecepcionista extends JFrame {
 	public void pasarPacienteAModificar(PacienteDTO paciente) {
 		this.panelModificarPaciente.datoPacienteActual(paciente);
 		cardLayout.show(panelContenedor, "MODIFICARPACIENTE");
+	}
+	
+	public void pasarPacienteHistoria(PacienteDTO paciente) {
+		this.panelHistoriaClinica.datoPacienteActual(paciente);
+		cardLayout.show(panelContenedor, "HISTORIACLINICA");
 	}
 	
 	public void mostrarListadoPacientes() {

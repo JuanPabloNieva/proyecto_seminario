@@ -79,7 +79,7 @@ public class ListadoPaciente extends JPanel {
 		btnModificarPaciente.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String dniPaciente = table.getModel().getValueAt(table.getSelectedRow(), 2).toString();
-				paciente = api.obtenerPacientePorDni(dniPaciente);
+				paciente = api.obtenerPacientePorDni(Integer.parseInt(dniPaciente));
 				frame.pasarPacienteAModificar(paciente);
 			}
 		});
@@ -104,6 +104,13 @@ public class ListadoPaciente extends JPanel {
 		pnlBotonesOperaciones.add(btnEliminarPaciente);
 
 		btnHClinica = new JButton("Historia Clinica");
+		btnHClinica.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String dniPaciente = table.getModel().getValueAt(table.getSelectedRow(), 2).toString();
+				paciente = api.obtenerPacientePorDni(Integer.parseInt(dniPaciente));
+				frame.pasarPacienteHistoria(paciente);
+			}
+		});
 		btnHClinica.setEnabled(false);
 		pnlBotonesOperaciones.add(btnHClinica);
 

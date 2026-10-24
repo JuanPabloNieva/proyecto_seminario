@@ -3,6 +3,7 @@ package ar.edu.unrn.seminario.api;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -11,10 +12,12 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import ar.edu.unrn.seminario.dto.EspecialidadDTO;
 import ar.edu.unrn.seminario.dto.MedicoDTO;
 import ar.edu.unrn.seminario.dto.ObraSocialDTO;
 import ar.edu.unrn.seminario.dto.PacienteDTO;
 import ar.edu.unrn.seminario.dto.RolDTO;
+import ar.edu.unrn.seminario.dto.TurnoDTO;
 import ar.edu.unrn.seminario.dto.UsuarioDTO;
 import ar.edu.unrn.seminario.exception.DataEmptyException;
 import ar.edu.unrn.seminario.modelo.Especialidad;
@@ -23,6 +26,7 @@ import ar.edu.unrn.seminario.modelo.ObraSocial;
 import ar.edu.unrn.seminario.modelo.Paciente;
 import ar.edu.unrn.seminario.modelo.Rol;
 import ar.edu.unrn.seminario.modelo.Usuario;
+import ar.edu.unrn.seminario.modelo.Turno;
 
 public class MemoryApi implements IApi {
 
@@ -135,9 +139,10 @@ public class MemoryApi implements IApi {
 	@Override
 	public List<MedicoDTO> obtenerMedicos() {
 		List<MedicoDTO> dtos = new ArrayList<>();
-		for (Medico u : this.medicos) {
-			dtos.add(new MedicoDTO(u.getNombre(), u.getApellido(), u.getDni(), u.getMatricula(), u.getEspecialidad(),
-					u.getTurnosDisponibles()));
+
+		for (Medico m : this.medicos) {
+			dtos.add(new MedicoDTO(m.getNombre(), m.getApellido(), m.getDni(), m.getMatricula(),
+					this.obtenerEspecialidad(m.getEspecialidad().getCodigo()), this.obtenerTurnosDisponibles(m)));
 		}
 		return dtos;
 	}
@@ -147,7 +152,19 @@ public class MemoryApi implements IApi {
 		List<PacienteDTO> dtos = new ArrayList<>();
 		for (Paciente p : this.pacientes) {
 			dtos.add(new PacienteDTO(p.getNombre(), p.getApellido(), p.getDni(), p.getObraSocial().getNombre(),
-					p.getHistoriaClinica()));
+					this.obtenerHistoriaClinica(p)));
+		}
+
+		return dtos;
+	}
+
+	@Override
+	public List<TurnoDTO> obtenerHistoriaClinica(Paciente paciente) {
+		List<TurnoDTO> dtos = new ArrayList<>();
+
+		for (Turno p : paciente.getHistoriaClinica()) {
+			dtos.add(new TurnoDTO(p.getIdTurno(), p.getFecha(), this.obtenerMedico(p.getMedico().getMatricula()),
+					this.obtenerPacientePorDni(p.getPaciente().getDni())));
 		}
 
 		return dtos;
@@ -157,6 +174,33 @@ public class MemoryApi implements IApi {
 	public UsuarioDTO obtenerUsuario(String username) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public EspecialidadDTO obtenerEspecialidad(Integer codigo) {
+		EspecialidadDTO especialidadDTO = this.especialidades.stream().filter(e -> e.getCodigo() == codigo).findFirst()
+				.map(e -> new EspecialidadDTO(e.getCodigo(), e.getNombre())).orElse(null);
+
+		return especialidadDTO;
+	}
+
+	@Override
+	public MedicoDTO obtenerMedico(String matricula) {
+		MedicoDTO medicoDTO = this.medicos.stream().filter(medico -> medico.getMatricula() == matricula).findFirst()
+				.map(m -> new MedicoDTO(m.getNombre(), m.getApellido(), m.getDni(), m.getMatricula(),
+						this.obtenerEspecialidad(m.getEspecialidad().getCodigo()), this.obtenerTurnosDisponibles(m)))
+				.orElse(null);
+		return medicoDTO;
+	}
+
+	public List<TurnoDTO> obtenerTurnosDisponibles(Medico medico) {
+		List<TurnoDTO> dtos = new ArrayList<>();
+		for (Turno t : medico.getTurnosDisponibles()) {
+
+			dtos.add(new TurnoDTO(t.getIdTurno(), t.getFecha(), this.obtenerMedico(t.getMedico().getMatricula()),
+					this.obtenerPacientePorDni(t.getPaciente().getDni())));
+		}
+		return dtos;
 	}
 
 	@Override
@@ -205,11 +249,16 @@ public class MemoryApi implements IApi {
 	}
 
 	@Override
-	public PacienteDTO obtenerPacientePorDni(String dniPaciente) {
-		int dni = Integer.parseInt(dniPaciente);
+	public PacienteDTO obtenerPacientePorDni(Integer dniPaciente) {
+		int dni = dniPaciente;
 		Paciente paciente = this.pacientes.stream().filter(p -> (p.getDni() == dni)).findFirst().orElse(null);
+		List<TurnoDTO> historiaDTO = paciente.getHistoriaClinica().stream()
+				.map(turno -> new TurnoDTO(turno.getIdTurno(), turno.getFecha(),
+						this.obtenerMedico(turno.getMedico().getMatricula()),
+						this.obtenerPacientePorDni(turno.getPaciente().getDni())))
+				.collect(Collectors.toList());
 		PacienteDTO pacienteDTO = new PacienteDTO(paciente.getNombre(), paciente.getApellido(), paciente.getDni(),
-				paciente.getObraSocial().getNombre(), paciente.getHistoriaClinica());
+				paciente.getObraSocial().getNombre(), historiaDTO);
 		return pacienteDTO;
 	}
 

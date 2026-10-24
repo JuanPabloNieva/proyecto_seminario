@@ -11,12 +11,12 @@ public class MedicoDTO {
 	private String apellido;
 	private int dni;
 	private String matricula;
-	private Especialidad especialidad;
-	private List<Turno> turnosDisponibles;
+	private EspecialidadDTO especialidad;
+	private List<TurnoDTO> turnosDisponibles;
 	
 	
 	
-	public MedicoDTO(String nombre, String apellido, int dni, String matricula, Especialidad especialidad, List<Turno> turnos) {
+	public MedicoDTO(String nombre, String apellido, int dni, String matricula, EspecialidadDTO especialidad, List<TurnoDTO> turnos) {
 		this.nombre = nombre;
 		this.apellido = apellido;
 		this.dni = dni;
@@ -75,25 +75,25 @@ public class MedicoDTO {
 
 
 
-	public Especialidad getEspecialidad() {
+	public EspecialidadDTO getEspecialidad() {
 		return especialidad;
 	}
 
 
 
-	public void setEspecialidad(Especialidad especialidad) {
+	public void setEspecialidad(EspecialidadDTO especialidad) {
 		this.especialidad = especialidad;
 	}
 
 
 
-	public List<Turno> getTurnosDisponibles() {
+	public List<TurnoDTO> getTurnosDisponibles() {
 		return turnosDisponibles;
 	}
 
 
 
-	public void setTurnosDisponibles(List<Turno> turnosDisponibles) {
+	public void setTurnosDisponibles(List<TurnoDTO> turnosDisponibles) {
 		this.turnosDisponibles = turnosDisponibles;
 	}
 

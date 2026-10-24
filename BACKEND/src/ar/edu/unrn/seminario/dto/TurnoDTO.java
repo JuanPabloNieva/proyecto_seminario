@@ -9,12 +9,12 @@ import ar.edu.unrn.seminario.modelo.Paciente;
 public class TurnoDTO {
 	private int idTurno;
 	private LocalDateTime fecha;
-	private UsuarioDTO medico;
-	private Paciente paciente;
+	private MedicoDTO medico;
+	private PacienteDTO paciente;
 	private Atencion atencion;
 	
 	public TurnoDTO() {}
-	public TurnoDTO(int idTurno, LocalDateTime fecha, UsuarioDTO medico, Paciente paciente) {
+	public TurnoDTO(int idTurno, LocalDateTime fecha, MedicoDTO medico, PacienteDTO paciente) {
 		super();
 		this.idTurno = idTurno;
 		this.fecha = fecha;
@@ -34,16 +34,16 @@ public class TurnoDTO {
 	public void setFecha(LocalDateTime fecha) {
 		this.fecha = fecha;
 	}
-	public UsuarioDTO getMedico() {
+	public MedicoDTO getMedico() {
 		return medico;
 	}
-	public void setMedico(UsuarioDTO medico) {
+	public void setMedico(MedicoDTO medico) {
 		this.medico = medico;
 	}
-	public Paciente getPaciente() {
+	public PacienteDTO getPaciente() {
 		return paciente;
 	}
-	public void setPaciente(Paciente paciente) {
+	public void setPaciente(PacienteDTO paciente) {
 		this.paciente = paciente;
 	}
 	public Atencion getAtencion() {

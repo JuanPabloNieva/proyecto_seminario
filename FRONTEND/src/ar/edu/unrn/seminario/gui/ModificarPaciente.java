@@ -66,6 +66,7 @@ public class ModificarPaciente extends JPanel {
 		add(lblDNI);
 		
 		tfDni = new JTextField();
+		tfDni.setEditable(false);
 		tfDni.setColumns(10);
 		tfDni.setBounds(284, 243, 158, 20);
 		add(tfDni);
