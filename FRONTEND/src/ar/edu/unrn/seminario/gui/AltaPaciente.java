@@ -21,6 +21,7 @@ import javax.swing.JComboBox;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.SwingConstants;
 
 public class AltaPaciente extends JPanel {
 
@@ -126,6 +127,12 @@ public class AltaPaciente extends JPanel {
 		});
 		btnCancelar.setBounds(421, 337, 89, 23);
 		add(btnCancelar);
+		
+		JLabel lblRegistrarPaciente = new JLabel("Registrar Paciente");
+		lblRegistrarPaciente.setHorizontalAlignment(SwingConstants.CENTER);
+		lblRegistrarPaciente.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 15));
+		lblRegistrarPaciente.setBounds(213, 50, 297, 39);
+		add(lblRegistrarPaciente);
 
 	}
 

@@ -2,6 +2,7 @@ package ar.edu.unrn.seminario.gui;
 
 import javax.swing.JPanel;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 import java.awt.CardLayout;
 import java.awt.Font;
@@ -13,6 +14,8 @@ import javax.swing.JTextField;
 import ar.edu.unrn.seminario.api.IApi;
 import ar.edu.unrn.seminario.dto.ObraSocialDTO;
 import ar.edu.unrn.seminario.dto.PacienteDTO;
+import ar.edu.unrn.seminario.exception.DataEmptyException;
+import ar.edu.unrn.seminario.exception.DniErroneoException;
 
 import javax.swing.JComboBox;
 import javax.swing.JButton;
@@ -81,6 +84,36 @@ public class ModificarPaciente extends JPanel {
 		}
 		
 		JButton btnGuardarCambios = new JButton("Guardar Cambios");
+		btnGuardarCambios.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				ObraSocialDTO oSocial = obrasSociales.get(cbObraSocial.getSelectedIndex());
+
+				try {
+					String nombre = tfNombre.getText().trim();
+					String apellido = tfApellido.getText().trim();
+					String dniTxt = tfDni.getText().trim();
+					int dni;
+
+					if (dniTxt.matches("^\\d{7,8}$")) {
+						dni = Integer.parseInt(dniTxt);
+					} else {
+						throw new DniErroneoException(
+								"El dni no tiene un formato correcto. Ingrese numeros sin puntos");
+					}
+
+					api.modificarPaciente(nombre, apellido, dni, oSocial.getCodigo());
+					limpiarCampos();
+					JOptionPane.showMessageDialog(null, "Paciente modificado con exito!", "Info",
+							JOptionPane.INFORMATION_MESSAGE);
+					cardLayout.show(panelContenedor, "LISTADOPACIENTE");
+
+				} catch (DataEmptyException ex) {
+					JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+				} catch (DniErroneoException dnie) {
+					JOptionPane.showMessageDialog(null, dnie.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
 		btnGuardarCambios.setBounds(221, 346, 134, 23);
 		add(btnGuardarCambios);
 		

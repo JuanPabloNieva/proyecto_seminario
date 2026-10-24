@@ -48,5 +48,29 @@ public class Paciente extends Persona{
 		this.historiaClinica = historiaClinica;
 	}
 	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((String.valueOf(super.getDni()) == null) ? 0 : String.valueOf(super.getDni()).hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Paciente other = (Paciente) obj;
+		if (String.valueOf(super.getDni()) == null) {
+			if (String.valueOf(other.getDni()) != null)
+				return false;
+		} else if (!String.valueOf(super.getDni()).equals(String.valueOf(other.getDni())))
+			return false;
+		return true;
+	}
 	
 }

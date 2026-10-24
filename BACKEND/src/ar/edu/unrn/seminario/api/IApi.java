@@ -17,7 +17,9 @@ public interface IApi {
 	
 	void registrarMedico(String nombre, String apellido, int dni, String matricula, int Especialidad, Usuario usuario) throws DataEmptyException ;
 	
-	void registrarPaciente(String nombre, String apellido, int dni, Integer ObraSocial) throws DataEmptyException ;
+	void registrarPaciente(String nombre, String apellido, int dni, Integer obraSocial) throws DataEmptyException ;
+	
+	void modificarPaciente(String nombre, String apellido, int dni, Integer obraSocial) throws DataEmptyException ;
 
 	UsuarioDTO obtenerUsuario(String username);
 

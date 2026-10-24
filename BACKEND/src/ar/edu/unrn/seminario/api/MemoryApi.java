@@ -101,6 +101,19 @@ public class MemoryApi implements IApi {
 	}
 
 	@Override
+	public void modificarPaciente(String nombre, String apellido, int dni, Integer obraSocial)
+			throws DataEmptyException {
+		ObraSocial os = this.buscarObraSocial(obraSocial);
+		Paciente paciente = this.pacientes.stream().filter(p -> (p.getDni() == dni)).findFirst().orElse(null);
+		if (!paciente.equals(null)) {
+			paciente.setNombre(nombre);
+			paciente.setApellido(apellido);
+			paciente.setDni(dni);
+			paciente.setObraSocial(os);
+		}
+	}
+
+	@Override
 	public List<UsuarioDTO> obtenerUsuarios() {
 		List<UsuarioDTO> dtos = new ArrayList<>();
 		for (Usuario u : this.usuarios) {
