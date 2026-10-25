@@ -225,7 +225,7 @@ public class AltaTurno extends JPanel {
 		}
 		
 		if (!medicosEspecialidad.isEmpty()) {
-	        cbMedico.setSelectedIndex(0); // Esto selecciona el primero y debería disparar o forzar la carga
+	        cbMedico.setSelectedIndex(0); 
 	        cargarTurnos(medicosEspecialidad.get(0));
 	    } else {
 	        cbTurnosDisponibles.removeAllItems();

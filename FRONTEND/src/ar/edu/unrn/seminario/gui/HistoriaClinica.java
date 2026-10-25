@@ -18,6 +18,8 @@ import ar.edu.unrn.seminario.api.IApi;
 import ar.edu.unrn.seminario.dto.PacienteDTO;
 import ar.edu.unrn.seminario.dto.TurnoDTO;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.ActionEvent;
 
 public class HistoriaClinica extends JPanel {
@@ -25,13 +27,14 @@ public class HistoriaClinica extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private JTable table;
 	private DefaultTableModel modelo;
-	
+	private IApi api;
 	private List<TurnoDTO> historiaClinica;
 
 	/**
 	 * Create the panel.
 	 */
 	public HistoriaClinica(IApi api, JPanel panelContenedor, CardLayout cardLayout) {
+		this.api = api;
 		setLayout(new BorderLayout(0, 0));
 
 		JPanel pBotones = new JPanel();
@@ -61,7 +64,7 @@ public class HistoriaClinica extends JPanel {
 
 		table = new JTable();
 		modelo = new DefaultTableModel(new Object[][] {},
-				new String[] { "ID", "Fecha", "Médico", "Activo" }) {
+				new String[] { "ID", "Fecha", "Paciente", "Médico", "Activo" }) {
 			@Override
 			public boolean isCellEditable(int row, int column) {
 				return false; // Ninguna celda es editable
@@ -70,11 +73,27 @@ public class HistoriaClinica extends JPanel {
 
 		table.setModel(modelo);
 		scrollPane.setViewportView(table);
+		
+		this.addComponentListener(new ComponentAdapter() {
+			@Override
+			public void componentShown(ComponentEvent e) {
+				actualizarTabla();
+			}
+		});
 
 	}
 	
 	public void datoPacienteActual(PacienteDTO paciente) {
 		historiaClinica = paciente.getHistoriaClinica();
+	}
+	
+	public void actualizarTabla() {
+		modelo.setRowCount(0);
+
+		// Agrega los usuarios en el model
+		for (TurnoDTO t : this.historiaClinica) {
+			modelo.addRow(new Object[] { t.getIdTurno(), t.getFecha(), t.getPaciente(), t.getMedico(), t.isActivo() });
+		}
 	}
 
 }
