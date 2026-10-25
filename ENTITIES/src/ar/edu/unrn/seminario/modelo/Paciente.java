@@ -48,6 +48,10 @@ public class Paciente extends Persona{
 		this.historiaClinica = historiaClinica;
 	}
 	
+	public void agregarTurnoHistoriaClinica(Turno t) {
+		this.historiaClinica.add(t);
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

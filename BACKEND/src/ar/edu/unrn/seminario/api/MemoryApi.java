@@ -54,6 +54,7 @@ public class MemoryApi implements IApi {
 		this.especialidades.add(new Especialidad(3, "Dermatologia"));
 
 		inicializarUsuarios();
+		inicializarMedicos();
 	}
 
 	private void inicializarUsuarios() {
@@ -94,6 +95,7 @@ public class MemoryApi implements IApi {
 		Especialidad espec = this.buscarEspecialidad(especialidad);
 		Medico medico = new Medico(nombre, apellido, dni, matricula, espec);
 		medico.setUsuario(usuario);
+		this.medicos.add(medico);
 	}
 
 	@Override
@@ -102,6 +104,21 @@ public class MemoryApi implements IApi {
 		ObraSocial os = this.buscarObraSocial(obraSocial);
 		Paciente paciente = new Paciente(nombre, apellido, dni, os);
 		this.pacientes.add(paciente);
+	}
+
+	@Override
+	public void registrarTurno(MedicoDTO medicoTurno, TurnoDTO turnoElegido, PacienteDTO pacienteTurno)
+			throws DataEmptyException {
+		Medico medico = this.buscarMedico(medicoTurno.getMatricula());
+		Paciente paciente = this.buscarPaciente(pacienteTurno.getDni());
+		for (Turno t : medico.getTurnosDisponibles()) {
+			if (t.getFecha().equals(turnoElegido.getFecha())) {
+				t.setActivo(false);
+				t.setDniPaciente(paciente.getDni());
+				paciente.agregarTurnoHistoriaClinica(t);
+			}
+		}
+
 	}
 
 	@Override
@@ -163,8 +180,18 @@ public class MemoryApi implements IApi {
 		List<TurnoDTO> dtos = new ArrayList<>();
 
 		for (Turno p : paciente.getHistoriaClinica()) {
-			dtos.add(new TurnoDTO(p.getIdTurno(), p.getFecha(), this.obtenerMedico(p.getMedico().getMatricula()),
-					this.obtenerPacientePorDni(p.getPaciente().getDni())));
+			dtos.add(new TurnoDTO(p.getIdTurno(), p.getFecha(), p.getMatriculaMedico(), p.getDniPaciente(),
+					p.isActivo()));
+		}
+
+		return dtos;
+	}
+
+	public Set<EspecialidadDTO> obtenerEspecialidades() {
+		Set<EspecialidadDTO> dtos = new HashSet<>();
+
+		for (Especialidad e : especialidades) {
+			dtos.add(new EspecialidadDTO(e.getCodigo(), e.getNombre()));
 		}
 
 		return dtos;
@@ -197,8 +224,8 @@ public class MemoryApi implements IApi {
 		List<TurnoDTO> dtos = new ArrayList<>();
 		for (Turno t : medico.getTurnosDisponibles()) {
 
-			dtos.add(new TurnoDTO(t.getIdTurno(), t.getFecha(), this.obtenerMedico(t.getMedico().getMatricula()),
-					this.obtenerPacientePorDni(t.getPaciente().getDni())));
+			dtos.add(new TurnoDTO(t.getIdTurno(), t.getFecha(), t.getMatriculaMedico(), t.getDniPaciente(),
+					t.isActivo()));
 		}
 		return dtos;
 	}
@@ -252,10 +279,9 @@ public class MemoryApi implements IApi {
 	public PacienteDTO obtenerPacientePorDni(Integer dniPaciente) {
 		int dni = dniPaciente;
 		Paciente paciente = this.pacientes.stream().filter(p -> (p.getDni() == dni)).findFirst().orElse(null);
-		List<TurnoDTO> historiaDTO = paciente.getHistoriaClinica().stream()
-				.map(turno -> new TurnoDTO(turno.getIdTurno(), turno.getFecha(),
-						this.obtenerMedico(turno.getMedico().getMatricula()),
-						this.obtenerPacientePorDni(turno.getPaciente().getDni())))
+		List<TurnoDTO> historiaDTO = paciente
+				.getHistoriaClinica().stream().map(turno -> new TurnoDTO(turno.getIdTurno(), turno.getFecha(),
+						turno.getMatriculaMedico(), turno.getDniPaciente(), turno.isActivo()))
 				.collect(Collectors.toList());
 		PacienteDTO pacienteDTO = new PacienteDTO(paciente.getNombre(), paciente.getApellido(), paciente.getDni(),
 				paciente.getObraSocial().getNombre(), historiaDTO);
@@ -305,6 +331,24 @@ public class MemoryApi implements IApi {
 		for (Usuario user : usuarios) {
 			if (user.getUsuario().equals(usuario))
 				return user;
+		}
+		return null;
+	}
+
+	private Medico buscarMedico(String matricula) {
+		for (Medico m : medicos) {
+			if (m.getMatricula().equals(matricula)) {
+				return m;
+			}
+		}
+		return null;
+	}
+	
+	private Paciente buscarPaciente(Integer dni) {
+		for (Paciente p : pacientes) {
+			if (p.getDni() == dni) {
+				return p;
+			}
 		}
 		return null;
 	}

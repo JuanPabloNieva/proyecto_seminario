@@ -17,6 +17,8 @@ import javax.swing.table.DefaultTableModel;
 import ar.edu.unrn.seminario.api.IApi;
 import ar.edu.unrn.seminario.dto.PacienteDTO;
 import ar.edu.unrn.seminario.dto.TurnoDTO;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class HistoriaClinica extends JPanel {
 
@@ -39,6 +41,11 @@ public class HistoriaClinica extends JPanel {
 		pBotones.add(btnVerDetalle);
 
 		JButton btnVolver = new JButton("Volver");
+		btnVolver.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				cardLayout.show(panelContenedor, "LISTADOPACIENTE");
+			}
+		});
 		pBotones.add(btnVolver);
 
 		JPanel pTitulo = new JPanel();

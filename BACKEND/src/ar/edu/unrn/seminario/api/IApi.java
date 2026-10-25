@@ -1,6 +1,7 @@
 package ar.edu.unrn.seminario.api;
 
 import java.util.List;
+import java.util.Set;
 
 import ar.edu.unrn.seminario.dto.EspecialidadDTO;
 import ar.edu.unrn.seminario.dto.MedicoDTO;
@@ -22,6 +23,8 @@ public interface IApi {
 	
 	void registrarPaciente(String nombre, String apellido, int dni, Integer obraSocial) throws DataEmptyException ;
 	
+	void registrarTurno(MedicoDTO medico, TurnoDTO turno, PacienteDTO pacienteTurno) throws DataEmptyException;
+	
 	void modificarPaciente(String nombre, String apellido, int dni, Integer obraSocial) throws DataEmptyException ;
 
 	UsuarioDTO obtenerUsuario(String username);
@@ -39,6 +42,8 @@ public interface IApi {
 	List<RolDTO> obtenerRolesActivos();
 	
 	List<TurnoDTO> obtenerHistoriaClinica(Paciente paciente);
+	
+	Set<EspecialidadDTO> obtenerEspecialidades();
 
 	void guardarRol(Integer codigo, String descripcion, boolean estado); // crear el objeto de dominio �Rol�
 
