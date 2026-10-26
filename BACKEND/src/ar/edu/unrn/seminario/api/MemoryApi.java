@@ -21,6 +21,7 @@ import ar.edu.unrn.seminario.dto.RolDTO;
 import ar.edu.unrn.seminario.dto.TurnoDTO;
 import ar.edu.unrn.seminario.dto.UsuarioDTO;
 import ar.edu.unrn.seminario.exception.DataEmptyException;
+import ar.edu.unrn.seminario.exception.GeneradorID;
 import ar.edu.unrn.seminario.modelo.Especialidad;
 import ar.edu.unrn.seminario.modelo.Medico;
 import ar.edu.unrn.seminario.modelo.ObraSocial;
@@ -106,9 +107,9 @@ public class MemoryApi implements IApi {
 			LocalDateTime fecha2 = LocalDateTime.of(2026, 8, 13, 10, 0, 0);
 			LocalDateTime fecha3 = LocalDateTime.of(2026, 9, 25, 10, 30, 0);
 			
-			TurnoDTO turno1 = new TurnoDTO(1, fecha1 , medico1.getMatricula(), paciente1.getDni(), true);
-			TurnoDTO turno2 = new TurnoDTO(2, fecha2 ,medico1.getMatricula(), paciente1.getDni(), true);
-			TurnoDTO turno3 = new TurnoDTO(3, fecha3 , medico2.getMatricula(), paciente2.getDni(), true);
+			TurnoDTO turno1 = new TurnoDTO(GeneradorID.obtenerSiguienteId(), fecha1 , medico1.getMatricula(), paciente1.getDni(), true);
+			TurnoDTO turno2 = new TurnoDTO(GeneradorID.obtenerSiguienteId(), fecha2 ,medico1.getMatricula(), paciente1.getDni(), true);
+			TurnoDTO turno3 = new TurnoDTO(GeneradorID.obtenerSiguienteId(), fecha3 , medico2.getMatricula(), paciente2.getDni(), true);
 			
 			registrarTurnoInicial(medicoDTO1, turno1, paciente1);
 			registrarTurnoInicial(medicoDTO1, turno2, paciente1);
