@@ -32,17 +32,24 @@ public class Medico extends Persona {
 	    LocalDateTime fin = inicio.plusWeeks(1);
 
 	    LocalTime horaInicio = LocalTime.of(9, 0);
-	    LocalTime horaFin = LocalTime.of(15, 0);
+	    LocalTime horaFin = LocalTime.of(18, 0);
 	    int duracionTurno = 30;
 
 	    LocalDateTime control = inicio;
 
 	    while (control.isBefore(fin)) {
 	        LocalTime horaTurno = control.toLocalTime();
-
+	        LocalDate fechaTurno = control.toLocalDate();
+	        LocalDateTime fyhTurno = LocalDateTime.of(fechaTurno, horaTurno);
+	        System.out.println( fyhTurno.isBefore(LocalDateTime.now()));
 	        if ((horaTurno.equals(horaInicio) || horaTurno.isAfter(horaInicio)) && horaTurno.isBefore(horaFin)) {
 	        	id = GeneradorID.obtenerSiguienteId();
-	            turnos.add(new Turno(id, control, this.getMatricula(), true));
+	        	if (fyhTurno.isBefore(LocalDateTime.now())) {
+	        		turnos.add(new Turno(id, control, this.getMatricula(), false));
+	        	} else {
+	        		turnos.add(new Turno(id, control, this.getMatricula(), true));
+	        	}
+	            
 	        }
 
 	        control = control.plusMinutes(duracionTurno);
