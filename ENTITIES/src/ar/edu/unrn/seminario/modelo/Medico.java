@@ -37,7 +37,6 @@ public class Medico extends Persona {
 	    while (control.isBefore(fin)) {
 	        LocalTime horaTurno = control.toLocalTime();
 
-	        // Quitamos temporalmente 'control.isAfter(ahora)' para garantizar que traiga turnos
 	        if ((horaTurno.equals(horaInicio) || horaTurno.isAfter(horaInicio)) && horaTurno.isBefore(horaFin)) {
 	            turnos.add(new Turno(id++, control, this.getMatricula(), true));
 	        }

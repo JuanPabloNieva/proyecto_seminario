@@ -20,6 +20,7 @@ import ar.edu.unrn.seminario.dto.TurnoDTO;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.time.format.DateTimeFormatter;
 import java.awt.event.ActionEvent;
 
 public class HistoriaClinica extends JPanel {
@@ -41,6 +42,15 @@ public class HistoriaClinica extends JPanel {
 		add(pBotones, BorderLayout.SOUTH);
 
 		JButton btnVerDetalle = new JButton("Ver Detalle");
+		btnVerDetalle.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String idTurno = table.getModel().getValueAt(table.getSelectedRow(), 0).toString();
+				String matriculaMedico = table.getModel().getValueAt(table.getSelectedRow(), 0).toString();
+
+				// paciente = api.obtenerPacientePorDni(Integer.parseInt(dniPaciente));
+				// frame.pasarPacienteHistoria(paciente);
+			}
+		});
 		pBotones.add(btnVerDetalle);
 
 		JButton btnVolver = new JButton("Volver");
@@ -67,13 +77,13 @@ public class HistoriaClinica extends JPanel {
 				new String[] { "ID", "Fecha", "Paciente", "Médico", "Activo" }) {
 			@Override
 			public boolean isCellEditable(int row, int column) {
-				return false; // Ninguna celda es editable
+				return false;
 			}
 		};
 
 		table.setModel(modelo);
 		scrollPane.setViewportView(table);
-		
+
 		this.addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentShown(ComponentEvent e) {
@@ -82,17 +92,18 @@ public class HistoriaClinica extends JPanel {
 		});
 
 	}
-	
+
 	public void datoPacienteActual(PacienteDTO paciente) {
 		historiaClinica = paciente.getHistoriaClinica();
 	}
-	
+
 	public void actualizarTabla() {
 		modelo.setRowCount(0);
 
-		// Agrega los usuarios en el model
 		for (TurnoDTO t : this.historiaClinica) {
-			modelo.addRow(new Object[] { t.getIdTurno(), t.getFecha(), t.getPaciente(), t.getMedico(), t.isActivo() });
+			modelo.addRow(new Object[] { t.getIdTurno(),
+					t.getFecha().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")), t.getPaciente(),
+					t.getMedico(), t.isActivo() });
 		}
 	}
 

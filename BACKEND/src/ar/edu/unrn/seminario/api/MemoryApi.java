@@ -1,5 +1,6 @@
 package ar.edu.unrn.seminario.api;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -55,6 +56,8 @@ public class MemoryApi implements IApi {
 
 		inicializarUsuarios();
 		inicializarMedicos();
+		inicializarPacientes();
+		inicializarTurnos();
 	}
 
 	private void inicializarUsuarios() {
@@ -71,8 +74,46 @@ public class MemoryApi implements IApi {
 
 	private void inicializarMedicos() {
 		try {
-			registrarMedico("Bruno", "Gorosito", 35353532, "AFA256", 1, usuarios.get(2));
+			registrarMedico("Bruno", "Gorosito", 35353532, "AFA256", 3, usuarios.get(2));
 			registrarMedico("Laura", "Gonzalez", 35893532, "AFG886", 2, usuarios.get(3));
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+	}
+	
+	private void inicializarPacientes() {
+		try {
+			registrarPaciente("Jose", "Perez", 34695322, 1);
+			registrarPaciente("Maria", "Gutierrez", 16535465, 2);
+		} catch (Exception e) {
+			System.out.println(e);
+		}
+	}
+	
+	private void inicializarTurnos() {
+		try {
+			
+			Medico medico1 = medicos.get(0);
+			Medico medico2 = medicos.get(1);
+			
+			MedicoDTO medicoDTO1 = obtenerMedico(medico1.getMatricula());
+			MedicoDTO medicoDTO2 = obtenerMedico(medico2.getMatricula());
+			
+			PacienteDTO paciente1 = obtenerPacientePorDni(34695322);
+			PacienteDTO paciente2 = obtenerPacientePorDni(16535465);
+			
+			LocalDateTime fecha1 = LocalDateTime.of(2026, 4, 25, 14, 30, 0);
+			LocalDateTime fecha2 = LocalDateTime.of(2026, 8, 13, 10, 0, 0);
+			LocalDateTime fecha3 = LocalDateTime.of(2026, 9, 25, 10, 30, 0);
+			
+			TurnoDTO turno1 = new TurnoDTO(1, fecha1 , medico1.getMatricula(), paciente1.getDni(), true);
+			TurnoDTO turno2 = new TurnoDTO(2, fecha2 ,medico1.getMatricula(), paciente1.getDni(), true);
+			TurnoDTO turno3 = new TurnoDTO(3, fecha3 , medico2.getMatricula(), paciente2.getDni(), true);
+			
+			registrarTurnoInicial(medicoDTO1, turno1, paciente1);
+			registrarTurnoInicial(medicoDTO1, turno2, paciente1);
+			registrarTurnoInicial(medicoDTO2, turno3, paciente2);
+			
 		} catch (Exception e) {
 			System.out.println(e);
 		}
@@ -111,6 +152,7 @@ public class MemoryApi implements IApi {
 			throws DataEmptyException {
 		Medico medico = this.buscarMedico(medicoTurno.getMatricula());
 		Paciente paciente = this.buscarPaciente(pacienteTurno.getDni());
+		
 		for (Turno t : medico.getTurnosDisponibles()) {
 			if (t.getFecha().equals(turnoElegido.getFecha())) {
 				t.setActivo(false);
@@ -118,6 +160,14 @@ public class MemoryApi implements IApi {
 				paciente.agregarTurnoHistoriaClinica(t);
 			}
 		}
+
+	}
+	
+	private void registrarTurnoInicial(MedicoDTO medicoTurno, TurnoDTO turnoElegido, PacienteDTO pacienteTurno)
+			throws DataEmptyException {
+		Paciente paciente = this.buscarPaciente(pacienteTurno.getDni());
+		Turno t = new Turno(turnoElegido.getIdTurno(), turnoElegido.getFecha(), turnoElegido.getMatriculaMedico(), turnoElegido.getDniPaciente(), false);
+		paciente.agregarTurnoHistoriaClinica(t);
 
 	}
 
