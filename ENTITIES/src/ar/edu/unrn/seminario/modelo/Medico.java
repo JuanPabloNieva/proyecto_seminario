@@ -41,7 +41,7 @@ public class Medico extends Persona {
 	        LocalTime horaTurno = control.toLocalTime();
 	        LocalDate fechaTurno = control.toLocalDate();
 	        LocalDateTime fyhTurno = LocalDateTime.of(fechaTurno, horaTurno);
-	        System.out.println( fyhTurno.isBefore(LocalDateTime.now()));
+	        
 	        if ((horaTurno.equals(horaInicio) || horaTurno.isAfter(horaInicio)) && horaTurno.isBefore(horaFin)) {
 	        	id = GeneradorID.obtenerSiguienteId();
 	        	if (fyhTurno.isBefore(LocalDateTime.now())) {

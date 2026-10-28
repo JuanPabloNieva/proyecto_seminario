@@ -29,7 +29,7 @@ public class VentanaRecepcionista extends JFrame {
 	private JPanel contentPane;
 	private CardLayout cardLayout;
 	private JPanel panelContenedor;
-	
+
 	private AltaPaciente panelAltaPaciente;
 	private ListadoPaciente panelListadoPacientes;
 	private ModificarPaciente panelModificarPaciente;
@@ -58,7 +58,7 @@ public class VentanaRecepcionista extends JFrame {
 	 * Create the frame.
 	 */
 	public VentanaRecepcionista(IApi api) {
-		
+
 		setTitle("SISTEMA SALUD - Recepcionista");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 700, 550);
@@ -66,36 +66,36 @@ public class VentanaRecepcionista extends JFrame {
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(new BorderLayout(0, 0));
-		
+
 		cardLayout = new CardLayout();
-		
+
 		panelContenedor = new JPanel(cardLayout);
 		contentPane.add(panelContenedor, BorderLayout.CENTER);
-		
+
 		// Instanciar paneles
-		
+
 		panelAltaPaciente = new AltaPaciente(api, panelContenedor, cardLayout);
 		panelListadoPacientes = new ListadoPaciente(this, api, panelContenedor, cardLayout);
 		panelModificarPaciente = new ModificarPaciente(api, panelContenedor, cardLayout);
 		panelHistoriaClinica = new HistoriaClinica(api, panelContenedor, cardLayout);
 		panelAltaTurno = new AltaTurno(api, panelContenedor, cardLayout);
 		panelDefault = new PanelRecepcionistaDefault();
-		
+
 		// Agregarlos al panel contenedor con un nombre clave (identificador)
-		
+
 		panelContenedor.add(panelDefault, "PANELDEFAULT");
 		panelContenedor.add(panelAltaPaciente, "ALTAPACIENTE");
 		panelContenedor.add(panelModificarPaciente, "MODIFICARPACIENTE");
 		panelContenedor.add(panelListadoPacientes, "LISTADOPACIENTE");
 		panelContenedor.add(panelHistoriaClinica, "HISTORIACLINICA");
 		panelContenedor.add(panelAltaTurno, "ALTATURNO");
-		
+
 		JMenuBar barraMenu = new JMenuBar();
 		contentPane.add(barraMenu, BorderLayout.NORTH);
-		
+
 		JMenu menuPacientes = new JMenu("Pacientes");
 		barraMenu.add(menuPacientes);
-		
+
 		JMenuItem opcionRegistrarPaciente = new JMenuItem("Registrar Paciente");
 		opcionRegistrarPaciente.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -103,7 +103,7 @@ public class VentanaRecepcionista extends JFrame {
 			}
 		});
 		menuPacientes.add(opcionRegistrarPaciente);
-		
+
 		JMenuItem opcionListadoPacientes = new JMenuItem("Listado de Pacientes");
 		opcionListadoPacientes.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -111,10 +111,10 @@ public class VentanaRecepcionista extends JFrame {
 			}
 		});
 		menuPacientes.add(opcionListadoPacientes);
-		
+
 		JMenu menuTurnos = new JMenu("Turnos");
 		barraMenu.add(menuTurnos);
-		
+
 		JMenuItem opcionRegistrarTurno = new JMenuItem("Registrar Turnos");
 		opcionRegistrarTurno.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -122,28 +122,33 @@ public class VentanaRecepcionista extends JFrame {
 			}
 		});
 		menuTurnos.add(opcionRegistrarTurno);
-		
+
 		JMenuItem opcionListadoTurnos = new JMenuItem("Listado de Turnos");
 		menuTurnos.add(opcionListadoTurnos);
-		
+
 		JMenu menuConfiguracion = new JMenu("Configuración");
 		barraMenu.add(menuConfiguracion);
-		
+
 		JMenuItem opcionCerrarSesion = new JMenuItem("Cerrar Sesión");
-		menuConfiguracion.add(opcionCerrarSesion);		
+		opcionCerrarSesion.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				dispose();
+			}
+		});
+		menuConfiguracion.add(opcionCerrarSesion);
 
 	}
-	
+
 	public void pasarPacienteAModificar(PacienteDTO paciente) {
 		this.panelModificarPaciente.datoPacienteActual(paciente);
 		cardLayout.show(panelContenedor, "MODIFICARPACIENTE");
 	}
-	
+
 	public void pasarPacienteHistoria(PacienteDTO paciente) {
 		this.panelHistoriaClinica.datoPacienteActual(paciente);
 		cardLayout.show(panelContenedor, "HISTORIACLINICA");
 	}
-	
+
 	public void mostrarListadoPacientes() {
 		panelListadoPacientes.actualizarTabla();
 		cardLayout.show(panelContenedor, "ALTAPACIENTE");

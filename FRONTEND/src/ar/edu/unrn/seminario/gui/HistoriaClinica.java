@@ -73,8 +73,7 @@ public class HistoriaClinica extends JPanel {
 		add(scrollPane, BorderLayout.CENTER);
 
 		table = new JTable();
-		modelo = new DefaultTableModel(new Object[][] {},
-				new String[] { "ID", "Fecha", "Paciente", "Médico" }) {
+		modelo = new DefaultTableModel(new Object[][] {}, new String[] { "ID", "Fecha", "Paciente", "Médico" }) {
 			@Override
 			public boolean isCellEditable(int row, int column) {
 				return false;
@@ -101,9 +100,9 @@ public class HistoriaClinica extends JPanel {
 		modelo.setRowCount(0);
 
 		for (TurnoDTO t : this.historiaClinica) {
-			modelo.addRow(new Object[] { t.getIdTurno(),
-					t.getFecha().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")), t.getPaciente(),
-					t.getMedico()});
+			modelo.addRow(
+					new Object[] { t.getIdTurno(), t.getFecha().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
+							t.getPaciente(), t.getMedico() });
 		}
 	}
 
