@@ -140,11 +140,9 @@ public class ListadoPaciente extends JPanel {
 
 	public void actualizarTabla() {
 		modelo.setRowCount(0);
-
-		// Obtiene la lista de usuarios a mostrar
+		
 		List<PacienteDTO> pacientes = api.obtenerPacientes();
 
-		// Agrega los usuarios en el model
 		for (PacienteDTO p : pacientes) {
 			modelo.addRow(new Object[] { p.getNombre(), p.getApellido(), p.getDni(), p.getObraSocial() });
 		}

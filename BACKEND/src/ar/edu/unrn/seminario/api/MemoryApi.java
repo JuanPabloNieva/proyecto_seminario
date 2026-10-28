@@ -39,6 +39,7 @@ public class MemoryApi implements IApi {
 	private List<Medico> medicos = new ArrayList<>();
 	private List<Paciente> pacientes = new ArrayList<>();
 	private Map<String, String> usuariosRegistrados = new HashMap<String, String>();
+	private List<Turno> turnosAsignados = new ArrayList<>();
 
 	public MemoryApi() {
 
@@ -162,6 +163,7 @@ public class MemoryApi implements IApi {
 				t.setActivo(false);
 				t.setDniPaciente(paciente.getDni());
 				paciente.agregarTurnoHistoriaClinica(t);
+				this.turnosAsignados.add(t);
 			}
 		}
 
@@ -173,6 +175,7 @@ public class MemoryApi implements IApi {
 		Turno t = new Turno(turnoElegido.getIdTurno(), turnoElegido.getFecha(), turnoElegido.getMatriculaMedico(),
 				turnoElegido.getDniPaciente(), false);
 		paciente.agregarTurnoHistoriaClinica(t);
+		this.turnosAsignados.add(t);
 
 	}
 
@@ -251,6 +254,7 @@ public class MemoryApi implements IApi {
 
 		return dtos;
 	}
+	
 
 	@Override
 	public UsuarioDTO obtenerUsuario(String username) {
@@ -278,6 +282,17 @@ public class MemoryApi implements IApi {
 	public List<TurnoDTO> obtenerTurnosDisponibles(Medico medico) {
 		List<TurnoDTO> dtos = new ArrayList<>();
 		for (Turno t : medico.getTurnosDisponibles()) {
+
+			dtos.add(new TurnoDTO(t.getIdTurno(), t.getFecha(), t.getMatriculaMedico(), t.getDniPaciente(),
+					t.isActivo()));
+		}
+		return dtos;
+	}
+	
+	@Override
+	public List<TurnoDTO> obtenerTurnosAsignados() {
+		List<TurnoDTO> dtos = new ArrayList<>();
+		for (Turno t : this.turnosAsignados) {
 
 			dtos.add(new TurnoDTO(t.getIdTurno(), t.getFecha(), t.getMatriculaMedico(), t.getDniPaciente(),
 					t.isActivo()));

@@ -35,6 +35,8 @@ public interface IApi {
 
 	List<RolDTO> obtenerRoles();
 	
+	List<TurnoDTO> obtenerTurnosAsignados();
+	
 	List<ObraSocialDTO> obtenerObrasSociales();
 	
 	List<MedicoDTO> obtenerMedicos();

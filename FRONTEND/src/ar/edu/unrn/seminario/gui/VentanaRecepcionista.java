@@ -35,6 +35,7 @@ public class VentanaRecepcionista extends JFrame {
 	private ModificarPaciente panelModificarPaciente;
 	private HistoriaClinica panelHistoriaClinica;
 	private AltaTurno panelAltaTurno;
+	private ListadoTurno panelListadoTurno;
 	private JPanel panelDefault;
 
 	/**
@@ -79,6 +80,7 @@ public class VentanaRecepcionista extends JFrame {
 		panelModificarPaciente = new ModificarPaciente(api, panelContenedor, cardLayout);
 		panelHistoriaClinica = new HistoriaClinica(api, panelContenedor, cardLayout);
 		panelAltaTurno = new AltaTurno(api, panelContenedor, cardLayout);
+		panelListadoTurno = new ListadoTurno(api);
 		panelDefault = new PanelRecepcionistaDefault();
 
 		// Agregarlos al panel contenedor con un nombre clave (identificador)
@@ -88,6 +90,7 @@ public class VentanaRecepcionista extends JFrame {
 		panelContenedor.add(panelModificarPaciente, "MODIFICARPACIENTE");
 		panelContenedor.add(panelListadoPacientes, "LISTADOPACIENTE");
 		panelContenedor.add(panelHistoriaClinica, "HISTORIACLINICA");
+		panelContenedor.add(panelListadoTurno, "LISTADOTURNO");
 		panelContenedor.add(panelAltaTurno, "ALTATURNO");
 
 		JMenuBar barraMenu = new JMenuBar();
@@ -124,6 +127,11 @@ public class VentanaRecepcionista extends JFrame {
 		menuTurnos.add(opcionRegistrarTurno);
 
 		JMenuItem opcionListadoTurnos = new JMenuItem("Listado de Turnos");
+		opcionListadoTurnos.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				cardLayout.show(panelContenedor, "LISTADOTURNO");
+			}
+		});
 		menuTurnos.add(opcionListadoTurnos);
 
 		JMenu menuConfiguracion = new JMenu("Configuración");
