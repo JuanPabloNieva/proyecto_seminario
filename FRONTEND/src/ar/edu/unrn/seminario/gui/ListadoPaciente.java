@@ -23,6 +23,10 @@ import java.util.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
+import java.awt.Font;
+import javax.swing.border.EmptyBorder;
 
 public class ListadoPaciente extends JPanel {
 
@@ -35,6 +39,7 @@ public class ListadoPaciente extends JPanel {
 	private JButton btnModificarPaciente;
 	private JButton btnEliminarPaciente;
 	private JButton btnHClinica;
+	private JLabel lblListadoPaciente;
 
 	/**
 	 * Create the panel.
@@ -122,6 +127,12 @@ public class ListadoPaciente extends JPanel {
 			}
 		});
 		pnlBotonesOperaciones.add(btnCerrar);
+		
+		lblListadoPaciente = new JLabel("Listado Pacientes");
+		lblListadoPaciente.setBorder(new EmptyBorder(20, 0, 20, 0));
+		lblListadoPaciente.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 15));
+		lblListadoPaciente.setHorizontalAlignment(SwingConstants.CENTER);
+		add(lblListadoPaciente, BorderLayout.NORTH);
 
 		this.addComponentListener(new ComponentAdapter() {
 			@Override

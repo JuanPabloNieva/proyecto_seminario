@@ -93,6 +93,11 @@ public class ModificarTurno extends JPanel {
 		pBotones.add(btnConfirmar);
 
 		JButton btnCancelar = new JButton("Cancelar");
+		btnCancelar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				cardLayout.show(panelContenedor, "LISTADOTURNO");
+			}
+		});
 		pBotones.add(btnCancelar);
 
 		JPanel pForm = new JPanel();

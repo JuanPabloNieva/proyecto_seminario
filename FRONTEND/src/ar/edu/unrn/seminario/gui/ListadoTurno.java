@@ -2,6 +2,8 @@ package ar.edu.unrn.seminario.gui;
 
 import javax.swing.JPanel;
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
+
 import javax.swing.JScrollPane;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
@@ -42,7 +44,7 @@ public class ListadoTurno extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public ListadoTurno(IApi api, VentanaRecepcionista frame) {
+	public ListadoTurno(IApi api, VentanaRecepcionista frame, JPanel panelContenedor, CardLayout cardLayout) {
 		this.api = api;
 		setLayout(new BorderLayout(0, 0));
 
@@ -68,7 +70,7 @@ public class ListadoTurno extends JPanel {
 
 		JLabel lblTitulo = new JLabel("Listado de turnos");
 		lblTitulo.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 15));
-		lblTitulo.setBorder(new EmptyBorder(10, 0, 10, 0));
+		lblTitulo.setBorder(new EmptyBorder(20, 0, 20, 0));
 		lblTitulo.setHorizontalAlignment(SwingConstants.CENTER);
 		add(lblTitulo, BorderLayout.NORTH);
 
@@ -89,6 +91,12 @@ public class ListadoTurno extends JPanel {
 		pnlBotones.add(btnCancelarTurno);
 
 		JButton btnVolver = new JButton("Volver");
+		btnVolver.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				habilitarBotones(false);
+				cardLayout.show(panelContenedor, "PANELDEFAULT");
+			}
+		});
 		pnlBotones.add(btnVolver);
 
 		this.addComponentListener(new ComponentAdapter() {

@@ -82,7 +82,7 @@ public class VentanaRecepcionista extends JFrame {
 		panelModificarPaciente = new ModificarPaciente(api, panelContenedor, cardLayout);
 		panelHistoriaClinica = new HistoriaClinica(api, panelContenedor, cardLayout);
 		panelAltaTurno = new AltaTurno(api, panelContenedor, cardLayout);
-		panelListadoTurno = new ListadoTurno(api, this);
+		panelListadoTurno = new ListadoTurno(api, this, panelContenedor, cardLayout);
 		panelModificarTurno = new ModificarTurno(api, panelContenedor, cardLayout);
 		panelDefault = new PanelRecepcionistaDefault();
 
