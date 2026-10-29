@@ -83,7 +83,7 @@ public class VentanaRecepcionista extends JFrame {
 		panelHistoriaClinica = new HistoriaClinica(api, panelContenedor, cardLayout);
 		panelAltaTurno = new AltaTurno(api, panelContenedor, cardLayout);
 		panelListadoTurno = new ListadoTurno(api, this);
-		panelModificarTurno = new ModificarTurno(api);
+		panelModificarTurno = new ModificarTurno(api, panelContenedor, cardLayout);
 		panelDefault = new PanelRecepcionistaDefault();
 
 		// Agregarlos al panel contenedor con un nombre clave (identificador)
@@ -160,7 +160,7 @@ public class VentanaRecepcionista extends JFrame {
 		this.panelModificarTurno.datoTurnoActual(turno);
 		cardLayout.show(panelContenedor, "MODIFICARTURNO");
 	}
-	
+
 	public void pasarPacienteHistoria(PacienteDTO paciente) {
 		this.panelHistoriaClinica.datoPacienteActual(paciente);
 		cardLayout.show(panelContenedor, "HISTORIACLINICA");

@@ -95,9 +95,10 @@ public class AltaTurno extends JPanel {
 						.collect(Collectors.toList());
 				
 				if (indiceTurno >= turnosActivos.size()) {
-		            JOptionPane.showMessageDialog(null, "El turno seleccionado ya no está disponible.", "Aviso", JOptionPane.WARNING_MESSAGE);
-		            return;
-		        }
+					JOptionPane.showMessageDialog(null, "El turno seleccionado ya no está disponible.", "Aviso",
+							JOptionPane.WARNING_MESSAGE);
+					return;
+				}
 				
 				TurnoDTO turno = turnosActivos.get(indiceTurno);
 				PacienteDTO paciente = pacientes.get(indicePaciente);

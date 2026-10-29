@@ -25,6 +25,8 @@ import javax.swing.JFrame;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class ListadoTurno extends JPanel {
 
@@ -48,6 +50,12 @@ public class ListadoTurno extends JPanel {
 		add(scrollPane, BorderLayout.CENTER);
 
 		table = new JTable();
+		table.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				habilitarBotones(true);
+			}
+		});
 		scrollPane.setViewportView(table);
 		modelo = new DefaultTableModel(new Object[][] {}, new String[] { "ID", "Fecha", "Paciente", "DNI", "Médico" }) {
 			@Override
@@ -70,7 +78,7 @@ public class ListadoTurno extends JPanel {
 		btnModificarTurno = new JButton("Modificar Turno");
 		btnModificarTurno.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String idTurno = table.getModel().getValueAt(table.getSelectedRow(), 1).toString();
+				String idTurno = table.getModel().getValueAt(table.getSelectedRow(), 0).toString();
 				turno = api.obtenerTurno(idTurno);
 				frame.pasarTurnoAModificar(turno);
 			}

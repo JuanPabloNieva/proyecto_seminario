@@ -169,6 +169,19 @@ public class MemoryApi implements IApi {
 
 	}
 
+	@Override
+	public void liberarTurno(Integer idTurno) throws DataEmptyException {
+		TurnoDTO turno = obtenerTurno(String.valueOf(idTurno));
+		Turno turnoALiberar = this.turnosAsignados.stream().filter(t -> t.getIdTurno() == turno.getIdTurno())
+				.findFirst().orElse(null);
+		this.turnosAsignados.removeIf(t -> t.getIdTurno() == turno.getIdTurno());
+		Medico medico = this.medicos.stream().filter(m -> m.getMatricula().equals(turno.getMatriculaMedico()))
+				.findFirst().orElse(null);
+		turnoALiberar.setActivo(true);
+		turnoALiberar.setDniPaciente(null);
+		turnoALiberar.setDetalle(null);
+	}
+
 	private void registrarTurnoInicial(MedicoDTO medicoTurno, TurnoDTO turnoElegido, PacienteDTO pacienteTurno)
 			throws DataEmptyException {
 		Paciente paciente = this.buscarPaciente(pacienteTurno.getDni());
