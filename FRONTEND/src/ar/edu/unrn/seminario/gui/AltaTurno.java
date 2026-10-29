@@ -35,6 +35,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ActionEvent;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
 
 public class AltaTurno extends JPanel {
 
@@ -124,58 +127,103 @@ public class AltaTurno extends JPanel {
 
 		JPanel pForm = new JPanel();
 		add(pForm, BorderLayout.CENTER);
-		pForm.setLayout(null);
-
-		JLabel lblPaciente = new JLabel("Paciente:");
-		lblPaciente.setBounds(211, 94, 85, 25);
-		pForm.add(lblPaciente);
-
-		cbPaciente = new JComboBox();
-		cbPaciente.setBounds(318, 94, 180, 25);
-		pForm.add(cbPaciente);
-
-		JLabel lblMedico = new JLabel("Especialidad:");
-		lblMedico.setBounds(211, 157, 85, 25);
-		pForm.add(lblMedico);
-
-		cbEspecialidad = new JComboBox();
-		cbEspecialidad.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (cbEspecialidad.getSelectedItem() != null) {
-					String especialidad = cbEspecialidad.getSelectedItem().toString();
-					recargarMedicos(especialidad);
-				}
-			}
-		});
-		cbEspecialidad.setBounds(318, 157, 180, 25);
-		pForm.add(cbEspecialidad);
-
-		JLabel lblNewLabel_1_1 = new JLabel("Médico:");
-		lblNewLabel_1_1.setBounds(211, 223, 85, 25);
-		pForm.add(lblNewLabel_1_1);
-
-		cbMedico = new JComboBox();
-		cbMedico.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				int seleccionado = cbMedico.getSelectedIndex();
-				if (seleccionado >= 0 && medicosFiltrados != null && seleccionado < medicosFiltrados.size()) {
-					MedicoDTO medico = medicosFiltrados.get(cbMedico.getSelectedIndex());
-					cargarTurnos(medico);
-				} else {
-					cbTurnosDisponibles.removeAllItems();
-				}
-			}
-		});
-		cbMedico.setBounds(318, 223, 180, 25);
-		pForm.add(cbMedico);
-
-		JLabel lblTurnosDisponibles = new JLabel("Turnos Disponibles:");
-		lblTurnosDisponibles.setBounds(211, 282, 97, 25);
-		pForm.add(lblTurnosDisponibles);
-
-		cbTurnosDisponibles = new JComboBox();
-		cbTurnosDisponibles.setBounds(318, 282, 180, 25);
-		pForm.add(cbTurnosDisponibles);
+						GridBagLayout gbl_pForm = new GridBagLayout();
+						gbl_pForm.columnWidths = new int[] {200, 200, 200};
+						gbl_pForm.rowHeights = new int[] {52, 21, 43, 21, 46, 21, 39, 25, 0, 0};
+						gbl_pForm.columnWeights = new double[]{0.0, 0.0};
+						gbl_pForm.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+						pForm.setLayout(gbl_pForm);
+														
+																JLabel lblPaciente = new JLabel("Paciente:");
+																GridBagConstraints gbc_lblPaciente = new GridBagConstraints();
+																gbc_lblPaciente.anchor = GridBagConstraints.WEST;
+																gbc_lblPaciente.weightx = 1.0;
+																gbc_lblPaciente.insets = new Insets(0, 0, 5, 5);
+																gbc_lblPaciente.gridx = 1;
+																gbc_lblPaciente.gridy = 1;
+																pForm.add(lblPaciente, gbc_lblPaciente);
+												
+														cbPaciente = new JComboBox();
+														GridBagConstraints gbc_cbPaciente = new GridBagConstraints();
+														gbc_cbPaciente.weightx = 1.0;
+														gbc_cbPaciente.fill = GridBagConstraints.HORIZONTAL;
+														gbc_cbPaciente.insets = new Insets(0, 0, 5, 5);
+														gbc_cbPaciente.gridx = 1;
+														gbc_cbPaciente.gridy = 2;
+														pForm.add(cbPaciente, gbc_cbPaciente);
+										
+												JLabel lblMedico = new JLabel("Especialidad:");
+												GridBagConstraints gbc_lblMedico = new GridBagConstraints();
+												gbc_lblMedico.weightx = 1.0;
+												gbc_lblMedico.fill = GridBagConstraints.HORIZONTAL;
+												gbc_lblMedico.insets = new Insets(0, 0, 5, 5);
+												gbc_lblMedico.gridx = 1;
+												gbc_lblMedico.gridy = 3;
+												pForm.add(lblMedico, gbc_lblMedico);
+										
+												cbEspecialidad = new JComboBox();
+												cbEspecialidad.addActionListener(new ActionListener() {
+													public void actionPerformed(ActionEvent e) {
+														if (cbEspecialidad.getSelectedItem() != null) {
+															String especialidad = cbEspecialidad.getSelectedItem().toString();
+															recargarMedicos(especialidad);
+														}
+													}
+												});
+												GridBagConstraints gbc_cbEspecialidad = new GridBagConstraints();
+												gbc_cbEspecialidad.weightx = 1.0;
+												gbc_cbEspecialidad.fill = GridBagConstraints.HORIZONTAL;
+												gbc_cbEspecialidad.insets = new Insets(0, 0, 5, 5);
+												gbc_cbEspecialidad.gridx = 1;
+												gbc_cbEspecialidad.gridy = 4;
+												pForm.add(cbEspecialidad, gbc_cbEspecialidad);
+								
+										JLabel lblNewLabel_1_1 = new JLabel("Médico:");
+										GridBagConstraints gbc_lblNewLabel_1_1 = new GridBagConstraints();
+										gbc_lblNewLabel_1_1.weightx = 1.0;
+										gbc_lblNewLabel_1_1.fill = GridBagConstraints.HORIZONTAL;
+										gbc_lblNewLabel_1_1.insets = new Insets(0, 0, 5, 5);
+										gbc_lblNewLabel_1_1.gridx = 1;
+										gbc_lblNewLabel_1_1.gridy = 5;
+										pForm.add(lblNewLabel_1_1, gbc_lblNewLabel_1_1);
+										
+												cbMedico = new JComboBox();
+												cbMedico.addActionListener(new ActionListener() {
+													public void actionPerformed(ActionEvent e) {
+														int seleccionado = cbMedico.getSelectedIndex();
+														if (seleccionado >= 0 && medicosFiltrados != null && seleccionado < medicosFiltrados.size()) {
+															MedicoDTO medico = medicosFiltrados.get(cbMedico.getSelectedIndex());
+															cargarTurnos(medico);
+														} else {
+															cbTurnosDisponibles.removeAllItems();
+														}
+													}
+												});
+												GridBagConstraints gbc_cbMedico = new GridBagConstraints();
+												gbc_cbMedico.weightx = 1.0;
+												gbc_cbMedico.fill = GridBagConstraints.HORIZONTAL;
+												gbc_cbMedico.insets = new Insets(0, 0, 5, 5);
+												gbc_cbMedico.gridx = 1;
+												gbc_cbMedico.gridy = 6;
+												pForm.add(cbMedico, gbc_cbMedico);
+								
+										JLabel lblTurnosDisponibles = new JLabel("Turnos Disponibles:");
+										GridBagConstraints gbc_lblTurnosDisponibles = new GridBagConstraints();
+										gbc_lblTurnosDisponibles.weightx = 1.0;
+										gbc_lblTurnosDisponibles.fill = GridBagConstraints.HORIZONTAL;
+										gbc_lblTurnosDisponibles.insets = new Insets(0, 0, 5, 5);
+										gbc_lblTurnosDisponibles.gridx = 1;
+										gbc_lblTurnosDisponibles.gridy = 7;
+										pForm.add(lblTurnosDisponibles, gbc_lblTurnosDisponibles);
+								
+										cbTurnosDisponibles = new JComboBox();
+										GridBagConstraints gbc_cbTurnosDisponibles = new GridBagConstraints();
+										gbc_cbTurnosDisponibles.weightx = 1.0;
+										gbc_cbTurnosDisponibles.insets = new Insets(0, 0, 0, 5);
+										gbc_cbTurnosDisponibles.fill = GridBagConstraints.HORIZONTAL;
+										gbc_cbTurnosDisponibles.gridx = 1;
+										gbc_cbTurnosDisponibles.gridy = 8;
+										pForm.add(cbTurnosDisponibles, gbc_cbTurnosDisponibles);
 
 		this.addComponentListener(new ComponentAdapter() {
 			@Override

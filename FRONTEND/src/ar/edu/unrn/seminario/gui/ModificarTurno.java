@@ -26,6 +26,9 @@ import javax.swing.JComboBox;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JTextField;
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
 
 public class ModificarTurno extends JPanel {
 
@@ -101,54 +104,106 @@ public class ModificarTurno extends JPanel {
 		pBotones.add(btnCancelar);
 
 		JPanel pForm = new JPanel();
-		pForm.setLayout(null);
 		add(pForm, BorderLayout.CENTER);
-
-		JLabel lblPaciente = new JLabel("Paciente:");
-		lblPaciente.setBounds(223, 99, 85, 25);
-		pForm.add(lblPaciente);
-
-		cbPaciente = new JComboBox();
-		cbPaciente.setEditable(true);
-		cbPaciente.setBounds(330, 99, 180, 25);
-		pForm.add(cbPaciente);
-
-		JLabel lblMedico = new JLabel("Especialidad:");
-		lblMedico.setBounds(223, 162, 85, 25);
-		pForm.add(lblMedico);
-
-		cbEspecialidad = new JComboBox();
-		cbEspecialidad.setEditable(true);
-		cbEspecialidad.setBounds(330, 162, 180, 25);
-		pForm.add(cbEspecialidad);
-
-		JLabel lblNewLabel_1_1 = new JLabel("Médico:");
-		lblNewLabel_1_1.setBounds(223, 228, 85, 25);
-		pForm.add(lblNewLabel_1_1);
-
-		cbMedico = new JComboBox();
-		cbMedico.setEditable(true);
-		cbMedico.setBounds(330, 228, 180, 25);
-		pForm.add(cbMedico);
-
-		JLabel lblTurnosDisponibles = new JLabel("Turnos Disponibles:");
-		lblTurnosDisponibles.setBounds(223, 287, 97, 25);
-		pForm.add(lblTurnosDisponibles);
-
-		cbTurnosDisponibles = new JComboBox();
-		cbTurnosDisponibles.setEditable(true);
-		cbTurnosDisponibles.setBounds(330, 287, 180, 25);
-		pForm.add(cbTurnosDisponibles);
-
-		JLabel lblIdTurno = new JLabel("ID Turno:");
-		lblIdTurno.setBounds(223, 52, 85, 25);
-		pForm.add(lblIdTurno);
-
-		tfIdTurno = new JTextField();
-		tfIdTurno.setHorizontalAlignment(SwingConstants.CENTER);
-		tfIdTurno.setBounds(330, 54, 180, 25);
-		pForm.add(tfIdTurno);
-		tfIdTurno.setColumns(10);
+		GridBagLayout gbl_pForm = new GridBagLayout();
+		gbl_pForm.columnWidths = new int[]{223, 97, 180, 0};
+		gbl_pForm.rowHeights = new int[]{52, 27, 0, 25, 38, 25, 41, 25, 34, 25, 0, 0};
+		gbl_pForm.columnWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
+		gbl_pForm.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		pForm.setLayout(gbl_pForm);
+		
+				JLabel lblIdTurno = new JLabel("ID Turno:");
+				GridBagConstraints gbc_lblIdTurno = new GridBagConstraints();
+				gbc_lblIdTurno.weightx = 1.0;
+				gbc_lblIdTurno.fill = GridBagConstraints.HORIZONTAL;
+				gbc_lblIdTurno.insets = new Insets(0, 0, 5, 5);
+				gbc_lblIdTurno.gridx = 1;
+				gbc_lblIdTurno.gridy = 1;
+				pForm.add(lblIdTurno, gbc_lblIdTurno);
+						
+								tfIdTurno = new JTextField();
+								tfIdTurno.setEditable(false);
+								tfIdTurno.setHorizontalAlignment(SwingConstants.CENTER);
+								GridBagConstraints gbc_tfIdTurno = new GridBagConstraints();
+								gbc_tfIdTurno.weightx = 1.0;
+								gbc_tfIdTurno.fill = GridBagConstraints.HORIZONTAL;
+								gbc_tfIdTurno.insets = new Insets(0, 0, 5, 5);
+								gbc_tfIdTurno.gridx = 1;
+								gbc_tfIdTurno.gridy = 2;
+								pForm.add(tfIdTurno, gbc_tfIdTurno);
+								tfIdTurno.setColumns(10);
+				
+						JLabel lblPaciente = new JLabel("Paciente:");
+						GridBagConstraints gbc_lblPaciente = new GridBagConstraints();
+						gbc_lblPaciente.weightx = 1.0;
+						gbc_lblPaciente.fill = GridBagConstraints.HORIZONTAL;
+						gbc_lblPaciente.insets = new Insets(0, 0, 5, 5);
+						gbc_lblPaciente.gridx = 1;
+						gbc_lblPaciente.gridy = 3;
+						pForm.add(lblPaciente, gbc_lblPaciente);
+								
+										cbPaciente = new JComboBox();
+										cbPaciente.setEditable(true);
+										GridBagConstraints gbc_cbPaciente = new GridBagConstraints();
+										gbc_cbPaciente.weightx = 1.0;
+										gbc_cbPaciente.fill = GridBagConstraints.HORIZONTAL;
+										gbc_cbPaciente.insets = new Insets(0, 0, 5, 5);
+										gbc_cbPaciente.gridx = 1;
+										gbc_cbPaciente.gridy = 4;
+										pForm.add(cbPaciente, gbc_cbPaciente);
+						
+								JLabel lblMedico = new JLabel("Especialidad:");
+								GridBagConstraints gbc_lblMedico = new GridBagConstraints();
+								gbc_lblMedico.fill = GridBagConstraints.BOTH;
+								gbc_lblMedico.insets = new Insets(0, 0, 5, 5);
+								gbc_lblMedico.gridx = 1;
+								gbc_lblMedico.gridy = 5;
+								pForm.add(lblMedico, gbc_lblMedico);
+						
+								cbEspecialidad = new JComboBox();
+								cbEspecialidad.setEditable(true);
+								GridBagConstraints gbc_cbEspecialidad = new GridBagConstraints();
+								gbc_cbEspecialidad.fill = GridBagConstraints.HORIZONTAL;
+								gbc_cbEspecialidad.insets = new Insets(0, 0, 5, 5);
+								gbc_cbEspecialidad.gridx = 1;
+								gbc_cbEspecialidad.gridy = 6;
+								pForm.add(cbEspecialidad, gbc_cbEspecialidad);
+				
+						JLabel lblNewLabel_1_1 = new JLabel("Médico:");
+						GridBagConstraints gbc_lblNewLabel_1_1 = new GridBagConstraints();
+						gbc_lblNewLabel_1_1.weightx = 1.0;
+						gbc_lblNewLabel_1_1.fill = GridBagConstraints.HORIZONTAL;
+						gbc_lblNewLabel_1_1.insets = new Insets(0, 0, 5, 5);
+						gbc_lblNewLabel_1_1.gridx = 1;
+						gbc_lblNewLabel_1_1.gridy = 7;
+						pForm.add(lblNewLabel_1_1, gbc_lblNewLabel_1_1);
+				
+						cbMedico = new JComboBox();
+						cbMedico.setEditable(true);
+						GridBagConstraints gbc_cbMedico = new GridBagConstraints();
+						gbc_cbMedico.weightx = 1.0;
+						gbc_cbMedico.fill = GridBagConstraints.HORIZONTAL;
+						gbc_cbMedico.insets = new Insets(0, 0, 5, 5);
+						gbc_cbMedico.gridx = 1;
+						gbc_cbMedico.gridy = 8;
+						pForm.add(cbMedico, gbc_cbMedico);
+		
+				JLabel lblTurnosDisponibles = new JLabel("Turnos Disponibles:");
+				GridBagConstraints gbc_lblTurnosDisponibles = new GridBagConstraints();
+				gbc_lblTurnosDisponibles.fill = GridBagConstraints.BOTH;
+				gbc_lblTurnosDisponibles.insets = new Insets(0, 0, 5, 5);
+				gbc_lblTurnosDisponibles.gridx = 1;
+				gbc_lblTurnosDisponibles.gridy = 9;
+				pForm.add(lblTurnosDisponibles, gbc_lblTurnosDisponibles);
+				
+						cbTurnosDisponibles = new JComboBox();
+						GridBagConstraints gbc_cbTurnosDisponibles = new GridBagConstraints();
+						gbc_cbTurnosDisponibles.weightx = 1.0;
+						gbc_cbTurnosDisponibles.insets = new Insets(0, 0, 0, 5);
+						gbc_cbTurnosDisponibles.fill = GridBagConstraints.HORIZONTAL;
+						gbc_cbTurnosDisponibles.gridx = 1;
+						gbc_cbTurnosDisponibles.gridy = 10;
+						pForm.add(cbTurnosDisponibles, gbc_cbTurnosDisponibles);
 	}
 
 	public void datoTurnoActual(TurnoDTO turno) {

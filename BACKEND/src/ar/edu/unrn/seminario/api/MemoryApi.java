@@ -123,6 +123,16 @@ public class MemoryApi implements IApi {
 			System.out.println(e);
 		}
 	}
+	
+	private void registrarTurnoInicial(MedicoDTO medicoTurno, TurnoDTO turnoElegido, PacienteDTO pacienteTurno)
+			throws DataEmptyException {
+		Paciente paciente = this.buscarPaciente(pacienteTurno.getDni());
+		Turno t = new Turno(turnoElegido.getIdTurno(), turnoElegido.getFecha(), turnoElegido.getMatriculaMedico(),
+				turnoElegido.getDniPaciente(), false);
+		paciente.agregarTurnoHistoriaClinica(t);
+		this.turnosAsignados.add(t);
+
+	}
 
 	@Override
 	public void registrarUsuario(String username, String password, String email, Integer rol)
@@ -175,22 +185,13 @@ public class MemoryApi implements IApi {
 		Turno turnoALiberar = this.turnosAsignados.stream().filter(t -> t.getIdTurno() == turno.getIdTurno())
 				.findFirst().orElse(null);
 		this.turnosAsignados.removeIf(t -> t.getIdTurno() == turno.getIdTurno());
-		Medico medico = this.medicos.stream().filter(m -> m.getMatricula().equals(turno.getMatriculaMedico()))
-				.findFirst().orElse(null);
+		/*Medico medico = this.medicos.stream().filter(m -> m.getMatricula().equals(turno.getMatriculaMedico()))
+				.findFirst().orElse(null);*/
 		turnoALiberar.setActivo(true);
 		turnoALiberar.setDniPaciente(null);
 		turnoALiberar.setDetalle(null);
 	}
 
-	private void registrarTurnoInicial(MedicoDTO medicoTurno, TurnoDTO turnoElegido, PacienteDTO pacienteTurno)
-			throws DataEmptyException {
-		Paciente paciente = this.buscarPaciente(pacienteTurno.getDni());
-		Turno t = new Turno(turnoElegido.getIdTurno(), turnoElegido.getFecha(), turnoElegido.getMatriculaMedico(),
-				turnoElegido.getDniPaciente(), false);
-		paciente.agregarTurnoHistoriaClinica(t);
-		this.turnosAsignados.add(t);
-
-	}
 
 	@Override
 	public void modificarPaciente(String nombre, String apellido, int dni, Integer obraSocial)

@@ -6,6 +6,7 @@ import java.awt.CardLayout;
 
 import javax.swing.JScrollPane;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
@@ -13,6 +14,7 @@ import ar.edu.unrn.seminario.api.IApi;
 import ar.edu.unrn.seminario.dto.MedicoDTO;
 import ar.edu.unrn.seminario.dto.PacienteDTO;
 import ar.edu.unrn.seminario.dto.TurnoDTO;
+import ar.edu.unrn.seminario.exception.DataEmptyException;
 
 import java.awt.Font;
 import java.awt.event.ComponentAdapter;
@@ -88,6 +90,19 @@ public class ListadoTurno extends JPanel {
 		pnlBotones.add(btnModificarTurno);
 
 		btnCancelarTurno = new JButton("Cancelar Turno");
+		btnCancelarTurno.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int idTurno = Integer.parseInt(table.getModel().getValueAt(table.getSelectedRow(), 0).toString());
+				try {
+					api.liberarTurno(idTurno);
+					actualizarTabla();
+					habilitarBotones(false);
+				} catch (DataEmptyException ex) {
+					JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+				}
+
+			}
+		});
 		pnlBotones.add(btnCancelarTurno);
 
 		JButton btnVolver = new JButton("Volver");
