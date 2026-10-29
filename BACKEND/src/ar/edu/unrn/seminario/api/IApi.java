@@ -57,6 +57,8 @@ public interface IApi {
 	
 	MedicoDTO obtenerMedico(String matricula);
 	
+	TurnoDTO obtenerTurno(String idTurno);
+	
 	void activarRol(Integer codigo); // recuperar el objeto Rol, implementar el comportamiento de estado.
 
 	void desactivarRol(Integer codigo); // recuperar el objeto Rol, imp

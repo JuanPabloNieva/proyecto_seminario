@@ -9,6 +9,7 @@ import javax.swing.border.EmptyBorder;
 import ar.edu.unrn.seminario.api.IApi;
 import ar.edu.unrn.seminario.api.MemoryApi;
 import ar.edu.unrn.seminario.dto.PacienteDTO;
+import ar.edu.unrn.seminario.dto.TurnoDTO;
 
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
@@ -36,6 +37,7 @@ public class VentanaRecepcionista extends JFrame {
 	private HistoriaClinica panelHistoriaClinica;
 	private AltaTurno panelAltaTurno;
 	private ListadoTurno panelListadoTurno;
+	private ModificarTurno panelModificarTurno;
 	private JPanel panelDefault;
 
 	/**
@@ -80,7 +82,8 @@ public class VentanaRecepcionista extends JFrame {
 		panelModificarPaciente = new ModificarPaciente(api, panelContenedor, cardLayout);
 		panelHistoriaClinica = new HistoriaClinica(api, panelContenedor, cardLayout);
 		panelAltaTurno = new AltaTurno(api, panelContenedor, cardLayout);
-		panelListadoTurno = new ListadoTurno(api);
+		panelListadoTurno = new ListadoTurno(api, this);
+		panelModificarTurno = new ModificarTurno(api);
 		panelDefault = new PanelRecepcionistaDefault();
 
 		// Agregarlos al panel contenedor con un nombre clave (identificador)
@@ -92,6 +95,7 @@ public class VentanaRecepcionista extends JFrame {
 		panelContenedor.add(panelHistoriaClinica, "HISTORIACLINICA");
 		panelContenedor.add(panelListadoTurno, "LISTADOTURNO");
 		panelContenedor.add(panelAltaTurno, "ALTATURNO");
+		panelContenedor.add(panelModificarTurno, "MODIFICARTURNO");
 
 		JMenuBar barraMenu = new JMenuBar();
 		contentPane.add(barraMenu, BorderLayout.NORTH);
@@ -152,6 +156,11 @@ public class VentanaRecepcionista extends JFrame {
 		cardLayout.show(panelContenedor, "MODIFICARPACIENTE");
 	}
 
+	public void pasarTurnoAModificar(TurnoDTO turno) {
+		this.panelModificarTurno.datoTurnoActual(turno);
+		cardLayout.show(panelContenedor, "MODIFICARTURNO");
+	}
+	
 	public void pasarPacienteHistoria(PacienteDTO paciente) {
 		this.panelHistoriaClinica.datoPacienteActual(paciente);
 		cardLayout.show(panelContenedor, "HISTORIACLINICA");

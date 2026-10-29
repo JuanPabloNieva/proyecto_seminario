@@ -15,26 +15,32 @@ import ar.edu.unrn.seminario.dto.TurnoDTO;
 import java.awt.Font;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import javax.swing.JTable;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.table.DefaultTableModel;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class ListadoTurno extends JPanel {
 
 	private static final long serialVersionUID = 1L;
-	private JTable table;
 	DefaultTableModel modelo;
 	private IApi api;
+	private TurnoDTO turno;
 
 	JButton btnModificarTurno;
 	JButton btnCancelarTurno;
+	private JTable table;
 
 	/**
 	 * Create the panel.
 	 */
-	public ListadoTurno(IApi api) {
+	public ListadoTurno(IApi api, VentanaRecepcionista frame) {
 		this.api = api;
 		setLayout(new BorderLayout(0, 0));
 
@@ -42,14 +48,15 @@ public class ListadoTurno extends JPanel {
 		add(scrollPane, BorderLayout.CENTER);
 
 		table = new JTable();
+		scrollPane.setViewportView(table);
 		modelo = new DefaultTableModel(new Object[][] {}, new String[] { "ID", "Fecha", "Paciente", "DNI", "Médico" }) {
 			@Override
 			public boolean isCellEditable(int row, int column) {
 				return false;
 			}
 		};
+
 		table.setModel(modelo);
-		add(table, BorderLayout.SOUTH);
 
 		JLabel lblTitulo = new JLabel("Listado de turnos");
 		lblTitulo.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 15));
@@ -61,6 +68,13 @@ public class ListadoTurno extends JPanel {
 		add(pnlBotones, BorderLayout.SOUTH);
 
 		btnModificarTurno = new JButton("Modificar Turno");
+		btnModificarTurno.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String idTurno = table.getModel().getValueAt(table.getSelectedRow(), 1).toString();
+				turno = api.obtenerTurno(idTurno);
+				frame.pasarTurnoAModificar(turno);
+			}
+		});
 		pnlBotones.add(btnModificarTurno);
 
 		btnCancelarTurno = new JButton("Cancelar Turno");
@@ -89,12 +103,16 @@ public class ListadoTurno extends JPanel {
 		MedicoDTO medico;
 		PacienteDTO paciente;
 
-		List<TurnoDTO> turnosAsignados = api.obtenerTurnosAsignados();
+		List<TurnoDTO> turnosAsignados = api.obtenerTurnosAsignados().stream()
+				.filter(t -> t.getFecha().isAfter(LocalDateTime.now())).toList();
 
 		for (TurnoDTO t : turnosAsignados) {
 			medico = this.api.obtenerMedico(t.getMedico());
 			paciente = this.api.obtenerPacientePorDni(t.getPaciente());
-			modelo.addRow(new Object[] { t.getIdTurno(), t.getFecha(), paciente, t.getPaciente(), medico });
+			modelo.addRow(
+					new Object[] { t.getIdTurno(), t.getFecha().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
+							paciente.getApellido() + ", " + paciente.getNombre(), paciente.getDni(),
+							medico.getApellido() + ", " + medico.getNombre() });
 		}
 	}
 
