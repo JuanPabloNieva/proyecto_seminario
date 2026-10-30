@@ -38,6 +38,7 @@ public class MemoryApi implements IApi {
 	private List<Turno> turnosAsignados = new ArrayList<>();
 
 	private final PacienteMapper pacienteMapper = new PacienteMapper();
+	private final TurnoMapper turnoMapper = new TurnoMapper();
 
 	public MemoryApi() {
 
@@ -240,12 +241,6 @@ public class MemoryApi implements IApi {
 	public List<PacienteDTO> obtenerPacientes() {
 		List<PacienteDTO> dtos = new ArrayList<>();
 		for (Paciente p : this.pacientes) {
-			/*
-			 * dtos.add(new PacienteDTO(p.getNombre(), p.getApellido(), p.getDni(),
-			 * p.getObraSocial().getNombre(), this.obtenerHistoriaClinica(p)));
-			 */
-
-			// Cambio de la linea de arriba por un mapper
 			dtos.add(pacienteMapper.transformar(p));
 		}
 
@@ -255,18 +250,14 @@ public class MemoryApi implements IApi {
 	@Override
 	public List<TurnoDTO> obtenerHistoriaClinica(Paciente paciente) {
 		List<TurnoDTO> dtos = new ArrayList<>();
-
-		for (Turno p : paciente.getHistoriaClinica()) {
-			dtos.add(new TurnoDTO(p.getIdTurno(), p.getFecha(), p.getMatriculaMedico(), p.getDniPaciente(),
-					p.isActivo()));
+		for (Turno t : paciente.getHistoriaClinica()) {
+			dtos.add(turnoMapper.transformar(t));
 		}
-
 		return dtos;
 	}
 
 	public Set<EspecialidadDTO> obtenerEspecialidades() {
 		Set<EspecialidadDTO> dtos = new HashSet<>();
-
 		for (Especialidad e : especialidades) {
 			dtos.add(new EspecialidadDTO(e.getCodigo(), e.getNombre()));
 		}
@@ -294,24 +285,22 @@ public class MemoryApi implements IApi {
 				.map(m -> new MedicoDTO(m.getNombre(), m.getApellido(), m.getDni(), m.getMatricula(),
 						this.obtenerEspecialidad(m.getEspecialidad().getCodigo()), this.obtenerTurnosDisponibles(m)))
 				.orElse(null);
+
 		return medicoDTO;
 	}
 
 	@Override
 	public TurnoDTO obtenerTurno(String idTurno) {
 		TurnoDTO turnoDTO = this.turnosAsignados.stream().filter(t -> t.getIdTurno() == Integer.parseInt(idTurno))
-				.findFirst().map(turno -> new TurnoDTO(turno.getIdTurno(), turno.getFecha(), turno.getMatriculaMedico(),
-						turno.getDniPaciente(), turno.isActivo()))
-				.orElse(null);
+				.findFirst().map(turno -> turnoMapper.transformar(turno)).orElse(null);
+
 		return turnoDTO;
 	}
 
 	public List<TurnoDTO> obtenerTurnosDisponibles(Medico medico) {
 		List<TurnoDTO> dtos = new ArrayList<>();
 		for (Turno t : medico.getTurnosDisponibles()) {
-
-			dtos.add(new TurnoDTO(t.getIdTurno(), t.getFecha(), t.getMatriculaMedico(), t.getDniPaciente(),
-					t.isActivo()));
+			dtos.add(turnoMapper.transformar(t));
 		}
 		return dtos;
 	}
@@ -320,8 +309,7 @@ public class MemoryApi implements IApi {
 	public List<TurnoDTO> obtenerTurnosAsignados() {
 		List<TurnoDTO> dtos = new ArrayList<>();
 		for (Turno t : this.turnosAsignados) {
-			dtos.add(new TurnoDTO(t.getIdTurno(), t.getFecha(), t.getMatriculaMedico(), t.getDniPaciente(),
-					t.isActivo()));
+			dtos.add(turnoMapper.transformar(t));
 		}
 		return dtos;
 	}
@@ -375,15 +363,6 @@ public class MemoryApi implements IApi {
 	public PacienteDTO obtenerPacientePorDni(Integer dniPaciente) {
 		int dni = dniPaciente;
 		Paciente paciente = this.pacientes.stream().filter(p -> (p.getDni() == dni)).findFirst().orElse(null);
-		/*
-		 * List<TurnoDTO> historiaDTO = paciente
-		 * .getHistoriaClinica().stream().map(turno -> new TurnoDTO(turno.getIdTurno(),
-		 * turno.getFecha(), turno.getMatriculaMedico(), turno.getDniPaciente(),
-		 * turno.isActivo())) .collect(Collectors.toList()); PacienteDTO pacienteDTO =
-		 * new PacienteDTO(paciente.getNombre(), paciente.getApellido(),
-		 * paciente.getDni(), paciente.getObraSocial().getNombre(), historiaDTO);
-		 */
-
 		PacienteDTO pacienteDTO = pacienteMapper.transformar(paciente);
 		return pacienteDTO;
 	}
