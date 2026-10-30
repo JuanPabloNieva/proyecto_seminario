@@ -8,8 +8,4 @@ public class TurnoMapper {
 		return new TurnoDTO(turno.getIdTurno(), turno.getFecha(), turno.getMatriculaMedico(), turno.getDniPaciente(),
 				turno.isActivo());
 	}
-
-//	public Turno transformar(TurnoDTO turno) {
-//		return 
-//	}
 }
