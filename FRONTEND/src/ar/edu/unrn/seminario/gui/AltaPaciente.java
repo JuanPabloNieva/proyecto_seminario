@@ -16,6 +16,7 @@ import ar.edu.unrn.seminario.dto.ObraSocialDTO;
 import ar.edu.unrn.seminario.dto.RolDTO;
 import ar.edu.unrn.seminario.exception.DataEmptyException;
 import ar.edu.unrn.seminario.exception.DniErroneoException;
+import ar.edu.unrn.seminario.exception.DniUnicoException;
 
 import javax.swing.JComboBox;
 import javax.swing.JButton;
@@ -102,16 +103,22 @@ public class AltaPaciente extends JPanel {
 								"El dni no tiene un formato correcto. Ingrese numeros sin puntos");
 					}
 
-					api.registrarPaciente(nombre, apellido, dni, oSocial.getCodigo());
-					limpiarCampos();
-					JOptionPane.showMessageDialog(null, "Paciente registrado con exito!", "Info",
-							JOptionPane.INFORMATION_MESSAGE);
-					cardLayout.show(panelContenedor, "PANELDEFAULT");
+					if (api.obtenerPacientePorDni(dni) == null) {
+						api.registrarPaciente(nombre, apellido, dni, oSocial.getCodigo());
+						limpiarCampos();
+						JOptionPane.showMessageDialog(null, "Paciente registrado con exito!", "Info",
+								JOptionPane.INFORMATION_MESSAGE);
+						cardLayout.show(panelContenedor, "PANELDEFAULT");
+					} else {
+						throw new DniUnicoException("Ya se ha registrado un paciente con el dni " + dni);
+					}
 
 				} catch (DataEmptyException ex) {
 					JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 				} catch (DniErroneoException dnie) {
 					JOptionPane.showMessageDialog(null, dnie.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+				} catch (DniUnicoException dniu) {
+					JOptionPane.showMessageDialog(null, dniu.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
@@ -127,7 +134,7 @@ public class AltaPaciente extends JPanel {
 		});
 		btnCancelar.setBounds(421, 337, 89, 23);
 		add(btnCancelar);
-		
+
 		JLabel lblRegistrarPaciente = new JLabel("Registrar Paciente");
 		lblRegistrarPaciente.setHorizontalAlignment(SwingConstants.CENTER);
 		lblRegistrarPaciente.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 15));

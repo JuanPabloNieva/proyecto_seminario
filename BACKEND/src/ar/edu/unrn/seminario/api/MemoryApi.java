@@ -363,6 +363,9 @@ public class MemoryApi implements IApi {
 	public PacienteDTO obtenerPacientePorDni(Integer dniPaciente) {
 		int dni = dniPaciente;
 		Paciente paciente = this.pacientes.stream().filter(p -> (p.getDni() == dni)).findFirst().orElse(null);
+		if (null == paciente) {
+			return null;
+		}
 		PacienteDTO pacienteDTO = pacienteMapper.transformar(paciente);
 		return pacienteDTO;
 	}
