@@ -42,18 +42,6 @@ public class HistoriaClinica extends JPanel {
 		JPanel pBotones = new JPanel();
 		add(pBotones, BorderLayout.SOUTH);
 
-		JButton btnVerDetalle = new JButton("Ver Detalle");
-		btnVerDetalle.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String idTurno = table.getModel().getValueAt(table.getSelectedRow(), 0).toString();
-				String matriculaMedico = table.getModel().getValueAt(table.getSelectedRow(), 0).toString();
-
-				// paciente = api.obtenerPacientePorDni(Integer.parseInt(dniPaciente));
-				// frame.pasarPacienteHistoria(paciente);
-			}
-		});
-		pBotones.add(btnVerDetalle);
-
 		JButton btnVolver = new JButton("Volver");
 		btnVolver.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
