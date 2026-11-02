@@ -199,7 +199,7 @@ public class MemoryApi implements IApi {
 			throws DataEmptyException {
 		ObraSocial os = this.buscarObraSocial(obraSocial);
 		Paciente paciente = this.pacientes.stream().filter(p -> (p.getDni() == dni)).findFirst().orElse(null);
-		if (!paciente.equals(null)) {
+		if (paciente != null) {
 			paciente.setNombre(nombre);
 			paciente.setApellido(apellido);
 			paciente.setDni(dni);
