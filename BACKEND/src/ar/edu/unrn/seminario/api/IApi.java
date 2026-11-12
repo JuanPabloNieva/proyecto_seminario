@@ -11,6 +11,7 @@ import ar.edu.unrn.seminario.dto.RolDTO;
 import ar.edu.unrn.seminario.dto.TurnoDTO;
 import ar.edu.unrn.seminario.dto.UsuarioDTO;
 import ar.edu.unrn.seminario.exception.DataEmptyException;
+import ar.edu.unrn.seminario.exception.DniErroneoException;
 import ar.edu.unrn.seminario.modelo.Medico;
 import ar.edu.unrn.seminario.modelo.Paciente;
 import ar.edu.unrn.seminario.modelo.Usuario;
@@ -20,15 +21,15 @@ public interface IApi {
 	void registrarUsuario(String username, String password, String email, Integer rol) throws DataEmptyException;
 
 	void registrarMedico(String nombre, String apellido, int dni, String matricula, int Especialidad, Usuario usuario)
-			throws DataEmptyException;
+			throws DataEmptyException, DniErroneoException;
 
-	void registrarPaciente(String nombre, String apellido, int dni, Integer obraSocial) throws DataEmptyException;
+	void registrarPaciente(String nombre, String apellido, int dni, Integer obraSocial) throws DataEmptyException, DniErroneoException;
 
 	void registrarTurno(MedicoDTO medico, TurnoDTO turno, PacienteDTO pacienteTurno) throws DataEmptyException;
 
 	void liberarTurno(Integer idTurno) throws DataEmptyException;
 
-	void modificarPaciente(String nombre, String apellido, int dni, Integer obraSocial) throws DataEmptyException;
+	void modificarPaciente(String nombre, String apellido, int dni, Integer obraSocial) throws DataEmptyException, DniErroneoException;
 
 	UsuarioDTO obtenerUsuario(String username);
 

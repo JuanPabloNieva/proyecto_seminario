@@ -17,6 +17,8 @@ import ar.edu.unrn.seminario.dto.RolDTO;
 import ar.edu.unrn.seminario.dto.TurnoDTO;
 import ar.edu.unrn.seminario.dto.UsuarioDTO;
 import ar.edu.unrn.seminario.exception.DataEmptyException;
+import ar.edu.unrn.seminario.exception.DniErroneoException;
+import ar.edu.unrn.seminario.exception.DniUnicoException;
 import ar.edu.unrn.seminario.exception.GeneradorID;
 import ar.edu.unrn.seminario.modelo.Especialidad;
 import ar.edu.unrn.seminario.modelo.Medico;
@@ -146,7 +148,7 @@ public class MemoryApi implements IApi {
 
 	@Override
 	public void registrarMedico(String nombre, String apellido, int dni, String matricula, int especialidad,
-			Usuario usuario) throws DataEmptyException {
+			Usuario usuario) throws DataEmptyException, DniErroneoException {
 		Especialidad espec = this.buscarEspecialidad(especialidad);
 		Medico medico = new Medico(nombre, apellido, dni, matricula, espec);
 		medico.setUsuario(usuario);
@@ -155,7 +157,18 @@ public class MemoryApi implements IApi {
 
 	@Override
 	public void registrarPaciente(String nombre, String apellido, int dni, Integer obraSocial)
-			throws DataEmptyException {
+			throws DataEmptyException, DniErroneoException{
+		
+		
+		  boolean existe = this.pacientes.stream().anyMatch(p -> p.getDni() == dni);
+		    if (existe) {
+		    	if (existe) {
+		    	   
+		    	    throw new DniUnicoException("Ya existe un paciente registrado con el DNI " + dni);
+		    	}
+		        throw new DniUnicoException("Ya existe un paciente registrado con el DNI " + dni);
+		    }
+		    
 		ObraSocial os = this.buscarObraSocial(obraSocial);
 		Paciente paciente = new Paciente(nombre, apellido, dni, os);
 		this.pacientes.add(paciente);
@@ -194,17 +207,14 @@ public class MemoryApi implements IApi {
 		turnoALiberar.setDetalle(null);
 	}
 
+	
 	@Override
 	public void modificarPaciente(String nombre, String apellido, int dni, Integer obraSocial)
-			throws DataEmptyException {
-		ObraSocial os = this.buscarObraSocial(obraSocial);
-		Paciente paciente = this.pacientes.stream().filter(p -> (p.getDni() == dni)).findFirst().orElse(null);
-		if (paciente != null) {
-			paciente.setNombre(nombre);
-			paciente.setApellido(apellido);
-			paciente.setDni(dni);
-			paciente.setObraSocial(os);
-		}
+	        throws DataEmptyException, DniErroneoException {
+
+	    this.eliminarPaciente(String.valueOf(dni));
+
+	    this.registrarPaciente(nombre, apellido, dni, obraSocial);
 	}
 
 	@Override

@@ -1,17 +1,16 @@
 package ar.edu.unrn.seminario.dto;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
-import ar.edu.unrn.seminario.modelo.Atencion;
-import ar.edu.unrn.seminario.modelo.Paciente;
+
+
 
 public class TurnoDTO {
 	private int idTurno;
 	private LocalDateTime fecha;
 	private String matriculaMedico;
 	private Integer dniPaciente;
-	private Atencion atencion;
+	private AtencionDTO atencion;
 	private boolean activo;
 	
 	public TurnoDTO() {}
@@ -22,7 +21,7 @@ public class TurnoDTO {
 		this.fecha = fecha;
 		this.matriculaMedico = matriculaMedico;
 		this.dniPaciente = dniPaciente;
-		atencion = new Atencion();
+		atencion = new AtencionDTO();
 		this.activo = activo;
 	}
 	public int getIdTurno() {
@@ -49,10 +48,10 @@ public class TurnoDTO {
 	public void setPaciente(Integer dniPaciente) {
 		this.dniPaciente = dniPaciente;
 	}
-	public Atencion getAtencion() {
+	public AtencionDTO getAtencion() {
 		return atencion;
 	}
-	public void setAtencion(Atencion atencion) {
+	public void setAtencion(AtencionDTO atencion) {
 		this.atencion = atencion;
 	}
 
