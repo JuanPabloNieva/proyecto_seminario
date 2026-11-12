@@ -31,6 +31,7 @@ public class HistoriaClinica extends JPanel {
 	private DefaultTableModel modelo;
 	private IApi api;
 	private List<TurnoDTO> historiaClinica;
+	private Integer dniPacienteActual;
 
 	/**
 	 * Create the panel.
@@ -83,16 +84,17 @@ public class HistoriaClinica extends JPanel {
 
 	public void datoPacienteActual(PacienteDTO paciente) {
 		historiaClinica = paciente.getHistoriaClinica();
+		dniPacienteActual = paciente.getDni();
 	}
 
 	public void actualizarTabla() {
 		modelo.setRowCount(0);
 		MedicoDTO medico;
-		PacienteDTO paciente;
+		PacienteDTO paciente = this.api.obtenerPacientePorDni(dniPacienteActual);
 		
 		for (TurnoDTO t : this.historiaClinica) {
 			medico = this.api.obtenerMedico(t.getMedico());
-			paciente = this.api.obtenerPacientePorDni(t.getPaciente());
+			//paciente = this.api.obtenerPacientePorDni(t.getPaciente());
 			modelo.addRow(
 					new Object[] { t.getIdTurno(), t.getFecha().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
 							paciente.getApellido() + ", " + paciente.getNombre(), paciente.getDni(), medico.getApellido() + ", " + medico.getNombre() });

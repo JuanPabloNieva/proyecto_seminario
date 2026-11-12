@@ -3,6 +3,8 @@ package ar.edu.unrn.seminario.modelo;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import ar.edu.unrn.seminario.exception.DataEmptyException;
 
@@ -12,16 +14,10 @@ public class Paciente extends Persona {
 
 	public Paciente(String nombre, String apellido, int dni, ObraSocial obraSocial) throws DataEmptyException {
 		super(nombre, apellido, dni);
-		
+
 		this.obraSocial = obraSocial;
 		this.historiaClinica = new ArrayList<>();
 	}
-
-//	private void validarCampoVacio(String valorCampo, String nombreCampo) throws DataEmptyException {
-//		if (valorCampo.equals("")) {
-//			throw new DataEmptyException("el campo " + nombreCampo + " no puede ser vacio");
-//		}
-//	}
 
 	public ObraSocial getObraSocial() {
 		return obraSocial;
@@ -32,8 +28,9 @@ public class Paciente extends Persona {
 	}
 
 	public List<Turno> getHistoriaClinica() {
+
 		List<Turno> turnosPasados = this.historiaClinica.stream()
-				.filter(t -> t.getFecha().isBefore(LocalDateTime.now())).toList();
+				.filter(t -> t.getFecha().isBefore(LocalDateTime.now())).collect(Collectors.toList());
 
 		return turnosPasados;
 	}

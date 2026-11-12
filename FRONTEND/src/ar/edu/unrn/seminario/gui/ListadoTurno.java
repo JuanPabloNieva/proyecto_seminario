@@ -22,6 +22,7 @@ import java.awt.event.ComponentEvent;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.swing.JTable;
 import javax.swing.JButton;
@@ -133,9 +134,9 @@ public class ListadoTurno extends JPanel {
 
 		MedicoDTO medico;
 		PacienteDTO paciente;
-
+		
 		List<TurnoDTO> turnosAsignados = api.obtenerTurnosAsignados().stream()
-				.filter(t -> t.getFecha().isAfter(LocalDateTime.now())).toList();
+				.filter(t -> t.getFecha().isAfter(LocalDateTime.now())).collect(Collectors.toList());
 
 		for (TurnoDTO t : turnosAsignados) {
 			medico = this.api.obtenerMedico(t.getMedico());
