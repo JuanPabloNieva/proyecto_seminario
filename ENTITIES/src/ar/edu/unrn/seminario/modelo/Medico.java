@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-
+import ar.edu.unrn.seminario.exception.DniErroneoException;
 import ar.edu.unrn.seminario.exception.DataEmptyException;
 import ar.edu.unrn.seminario.exception.GeneradorID;
 
@@ -16,7 +16,7 @@ public class Medico extends Persona {
 	private List<Turno> turnosDisponibles = new ArrayList<>();
 
 	public Medico(String nombre, String apellido, int dni, String matricula, Especialidad especialidad)
-			throws DataEmptyException {
+			throws DataEmptyException, DniErroneoException {
 		super(nombre, apellido, dni);
 		this.especialidad = especialidad;
 		this.matricula = matricula;

@@ -102,7 +102,7 @@ public class ModificarPaciente extends JPanel {
 							JOptionPane.INFORMATION_MESSAGE);
 					cardLayout.show(panelContenedor, "LISTADOPACIENTE");
 
-				} catch (DataEmptyException ex) {
+				} catch (DataEmptyException | DniErroneoException ex) {
 					JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 				}
 			}

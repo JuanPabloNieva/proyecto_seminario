@@ -5,14 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
-
+import ar.edu.unrn.seminario.exception.DniErroneoException;
 import ar.edu.unrn.seminario.exception.DataEmptyException;
 
 public class Paciente extends Persona {
 	private ObraSocial obraSocial;
 	private List<Turno> historiaClinica;
 
-	public Paciente(String nombre, String apellido, int dni, ObraSocial obraSocial) throws DataEmptyException {
+	public Paciente(String nombre, String apellido, int dni, ObraSocial obraSocial) throws DataEmptyException, DniErroneoException {
 		super(nombre, apellido, dni);
 
 		this.obraSocial = obraSocial;

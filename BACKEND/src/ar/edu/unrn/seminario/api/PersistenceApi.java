@@ -31,6 +31,7 @@ import ar.edu.unrn.seminario.accesos.MedicoDAOJDBC;
 import ar.edu.unrn.seminario.accesos.EspecialidadDao;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -266,11 +267,18 @@ public class PersistenceApi implements IApi {
 	
 	@Override
 	public List<PacienteDTO> obtenerPacientes() {
-
 	    List<Paciente> pacientes = pacienteDao.findAll();
 
-	    return pacientes.stream().map(paciente -> new PacienteDTO(paciente.getNombre(),paciente.getApellido(),
-	           paciente.getDni(),paciente.getObraSocial().getNombre(),obtenerHistoriaClinica(paciente))).collect(Collectors.toList());
+	    return pacientes.stream()
+	            .sorted(Comparator.comparing(Paciente::getApellido, String.CASE_INSENSITIVE_ORDER)
+	                    .thenComparing(Paciente::getNombre, String.CASE_INSENSITIVE_ORDER))
+	            .map(paciente -> new PacienteDTO(
+	                    paciente.getNombre(),
+	                    paciente.getApellido(),
+	                    paciente.getDni(),
+	                    paciente.getObraSocial().getNombre(),
+	                    obtenerHistoriaClinica(paciente)))
+	            .collect(Collectors.toList());
 	}
 	
 	@Override
