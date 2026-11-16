@@ -9,7 +9,7 @@ public class ConnectionManager {
 	protected static String URL_DB = "jdbc:mysql://localhost:3306/";
 	protected static String DB = "jdbc_seminario";
 	protected static String user = "root";
-	protected static String pass = "Benegas0517";
+	protected static String pass = "";
 	protected static Connection conn = null;
 
 /*	public static void connect() {

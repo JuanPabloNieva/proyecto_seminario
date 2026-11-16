@@ -12,7 +12,7 @@ public class TestConexion {
         String driver = "com.mysql.jdbc.Driver";
         String url = "jdbc:mysql://localhost:3306/jdbc_seminario";
         String user = "root";
-        String pass = "Benegas0517";
+        String pass = "";
 
         try {
             Class.forName(driver);
