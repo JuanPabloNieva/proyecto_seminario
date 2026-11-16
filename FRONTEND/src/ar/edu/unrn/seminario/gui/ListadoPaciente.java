@@ -19,6 +19,8 @@ import ar.edu.unrn.seminario.dto.UsuarioDTO;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -62,11 +64,11 @@ public class ListadoPaciente extends JPanel {
 		});
 
 		modelo = new DefaultTableModel(new Object[][] { { null, null, null, "" }, },
-				new String[] { "Nombre", "Apellido", "DNI", "Obra Social" }) {
-			@Override
-			public boolean isCellEditable(int row, int column) {
-				return false; // Ninguna celda es editable
-			}
+		        new String[] { "Apellido", "Nombre", "DNI", "Obra Social" }) {
+		    @Override
+		    public boolean isCellEditable(int row, int column) {
+		        return false;
+		    }
 		};
 
 		table.setModel(modelo);
@@ -150,12 +152,15 @@ public class ListadoPaciente extends JPanel {
 	}
 
 	public void actualizarTabla() {
-		modelo.setRowCount(0);
-		
-		List<PacienteDTO> pacientes = api.obtenerPacientes();
+	    modelo.setRowCount(0);
 
-		for (PacienteDTO p : pacientes) {
-			modelo.addRow(new Object[] { p.getNombre(), p.getApellido(), p.getDni(), p.getObraSocial() });
-		}
+	    List<PacienteDTO> pacientes = api.obtenerPacientes();
+
+	    Collections.sort(pacientes, Comparator.comparing(PacienteDTO::getApellido, String.CASE_INSENSITIVE_ORDER)
+	            .thenComparing(PacienteDTO::getNombre, String.CASE_INSENSITIVE_ORDER));
+
+	    for (PacienteDTO p : pacientes) {
+	        modelo.addRow(new Object[] { p.getApellido(), p.getNombre(), p.getDni(), p.getObraSocial() });
+	    }
 	}
 }

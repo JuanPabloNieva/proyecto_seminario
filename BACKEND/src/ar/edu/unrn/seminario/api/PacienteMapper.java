@@ -5,6 +5,7 @@ import java.util.List;
 import ar.edu.unrn.seminario.dto.PacienteDTO;
 import ar.edu.unrn.seminario.dto.TurnoDTO;
 import ar.edu.unrn.seminario.exception.DataEmptyException;
+import ar.edu.unrn.seminario.exception.DniErroneoException;
 import ar.edu.unrn.seminario.modelo.ObraSocial;
 import ar.edu.unrn.seminario.modelo.Paciente;
 
@@ -26,7 +27,7 @@ public class PacienteMapper {
 		return paciente;
 	}
 
-	public Paciente transformar(PacienteDTO pacienteDTO, ObraSocial os) throws DataEmptyException {
+	public Paciente transformar(PacienteDTO pacienteDTO, ObraSocial os) throws DataEmptyException,DniErroneoException {
 		return new Paciente(pacienteDTO.getNombre(), pacienteDTO.getApellido(), pacienteDTO.getDni(), os);
 	}
 }

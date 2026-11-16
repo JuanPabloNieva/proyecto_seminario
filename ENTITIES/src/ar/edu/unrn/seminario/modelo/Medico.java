@@ -7,7 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ar.edu.unrn.seminario.exception.DataEmptyException;
-import ar.edu.unrn.seminario.exception.GeneradorID;
+import ar.edu.unrn.seminario.exception.DniErroneoException;
+
 
 public class Medico extends Persona {
 	private Usuario usuario;
@@ -16,47 +17,42 @@ public class Medico extends Persona {
 	private List<Turno> turnosDisponibles = new ArrayList<>();
 
 	public Medico(String nombre, String apellido, int dni, String matricula, Especialidad especialidad)
-			throws DataEmptyException {
-		super(nombre, apellido, dni);
-		this.especialidad = especialidad;
-		this.matricula = matricula;
-		this.turnosDisponibles = generarTurnosSemanales();
+	        throws DataEmptyException, DniErroneoException {
+	    super(nombre, apellido, dni);
+	    this.especialidad = especialidad;
+	    this.matricula = matricula;
+	    this.turnosDisponibles = new ArrayList<>();
 	}
 
 	public List<Turno> generarTurnosSemanales() throws DataEmptyException {
 
-		List<Turno> turnos = new ArrayList<>();
+	    List<Turno> turnos = new ArrayList<>();
 
-		int id;
+	    LocalDateTime ahora = LocalDateTime.now();
+	    LocalDateTime fin = ahora.plusWeeks(1);
 
-		LocalDateTime inicio = LocalDate.now().atTime(9, 00);
-		LocalDateTime fin = inicio.plusWeeks(1);
+	    LocalDate fechaActual = ahora.toLocalDate();
 
-		LocalTime horaInicio = LocalTime.of(9, 0);
-		LocalTime horaFin = LocalTime.of(18, 0);
-		int duracionTurno = 30;
+	    LocalTime horaInicio = LocalTime.of(9, 0);
+	    LocalTime horaFin = LocalTime.of(18, 0);
 
-		LocalDateTime control = inicio;
+	    LocalDateTime control = fechaActual.atTime(horaInicio);
 
-		while (control.isBefore(fin)) {
-			LocalTime horaTurno = control.toLocalTime();
-			LocalDate fechaTurno = control.toLocalDate();
-			LocalDateTime fyhTurno = LocalDateTime.of(fechaTurno, horaTurno);
+	    while (control.isBefore(fin)) {
 
-			if ((horaTurno.equals(horaInicio) || horaTurno.isAfter(horaInicio)) && horaTurno.isBefore(horaFin)) {
-				id = GeneradorID.obtenerSiguienteId();
-				if (fyhTurno.isBefore(LocalDateTime.now())) {
-					turnos.add(new Turno(id, control, this.getMatricula(), false));
-				} else {
-					turnos.add(new Turno(id, control, this.getMatricula(), true));
-				}
+	        LocalTime horaTurno = control.toLocalTime();
 
-			}
+	        if (!control.isBefore(ahora) && !horaTurno.isBefore(horaInicio) && horaTurno.isBefore(horaFin)) {
 
-			control = control.plusMinutes(duracionTurno);
-		}
+	            Turno turno = new Turno(0, control, this.getMatricula(), true);
 
-		return turnos;
+	            turnos.add(turno);
+	        }
+
+	        control = control.plusMinutes(30);
+	    }
+
+	    return turnos;
 	}
 
 	public Usuario getUsuario() {

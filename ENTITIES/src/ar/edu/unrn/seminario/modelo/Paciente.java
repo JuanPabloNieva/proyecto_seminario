@@ -7,12 +7,13 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import ar.edu.unrn.seminario.exception.DataEmptyException;
+import ar.edu.unrn.seminario.exception.DniErroneoException;
 
 public class Paciente extends Persona {
 	private ObraSocial obraSocial;
 	private List<Turno> historiaClinica;
 
-	public Paciente(String nombre, String apellido, int dni, ObraSocial obraSocial) throws DataEmptyException {
+	public Paciente(String nombre, String apellido, int dni, ObraSocial obraSocial) throws DataEmptyException, DniErroneoException {
 		super(nombre, apellido, dni);
 
 		this.obraSocial = obraSocial;

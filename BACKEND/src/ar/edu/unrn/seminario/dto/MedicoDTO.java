@@ -3,8 +3,7 @@ package ar.edu.unrn.seminario.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-import ar.edu.unrn.seminario.modelo.Especialidad;
-import ar.edu.unrn.seminario.modelo.Turno;
+
 
 public class MedicoDTO {
 	private String nombre;

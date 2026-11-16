@@ -1,237 +1,413 @@
+
 package ar.edu.unrn.seminario.gui;
 
+import java.awt.BorderLayout;
+import java.awt.CardLayout;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.SwingConstants;
+import javax.swing.ListSelectionModel;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.border.EmptyBorder;
+
+import com.toedter.calendar.JDateChooser;
 
 import ar.edu.unrn.seminario.api.IApi;
+import ar.edu.unrn.seminario.dto.EspecialidadDTO;
 import ar.edu.unrn.seminario.dto.MedicoDTO;
 import ar.edu.unrn.seminario.dto.PacienteDTO;
 import ar.edu.unrn.seminario.dto.TurnoDTO;
 import ar.edu.unrn.seminario.exception.DataEmptyException;
 
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-
-import java.awt.Font;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.swing.SwingConstants;
-import java.awt.FlowLayout;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import javax.swing.JTextField;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-
 public class ModificarTurno extends JPanel {
 
-	private IApi api;
-	private JComboBox cbPaciente;
-	private JComboBox cbEspecialidad;
-	private JComboBox cbMedico;
-	private JComboBox cbTurnosDisponibles;
-	private TurnoDTO turno;
+    private static final long serialVersionUID = 1L;
 
-	private static final long serialVersionUID = 1L;
-	private JTextField tfIdTurno;
+    private IApi api;
 
-	/**
-	 * Create the panel.
-	 */
-	public ModificarTurno(IApi api, JPanel panelContenedor, CardLayout cardLayout) {
-		this.api = api;
-		setLayout(new BorderLayout(0, 0));
+    private TurnoDTO turno;
 
-		JPanel panel = new JPanel();
-		add(panel, BorderLayout.NORTH);
+    private Set<EspecialidadDTO> especialidades;
+    private List<MedicoDTO> medicos;
+    private List<MedicoDTO> medicosFiltrados = new ArrayList<>();
 
-		JLabel lblCambiarTurno = new JLabel("Cambiar Turno");
-		lblCambiarTurno.setHorizontalAlignment(SwingConstants.CENTER);
-		lblCambiarTurno.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 15));
-		panel.add(lblCambiarTurno);
+    private JComboBox<String> cbPaciente;
+    private JComboBox<String> cbEspecialidad;
+    private JComboBox<String> cbMedico;
 
-		JPanel pBotones = new JPanel();
-		add(pBotones, BorderLayout.SOUTH);
-		pBotones.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 25));
+    private JLabel lblIdTurno;
 
-		JButton btnConfirmar = new JButton("Confirmar");
-		btnConfirmar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				int indiceTurno = cbTurnosDisponibles.getSelectedIndex();
-				MedicoDTO medico = api.obtenerMedico(turno.getMatriculaMedico());
+    private JDateChooser calendario;
+    private JTable tablaTurnos;
+    private DefaultTableModel modeloTurnos;
 
-				List<TurnoDTO> turnosActivos = medico.getTurnosDisponibles().stream().filter(TurnoDTO::isActivo)
-						.collect(Collectors.toList());
+    private List<TurnoDTO> turnosFiltrados = new ArrayList<>();
+    private TurnoDTO turnoSeleccionado;
 
-				if (indiceTurno >= turnosActivos.size()) {
-					JOptionPane.showMessageDialog(null, "El médico no tiene mas turnos disponibles por el momento",
-							"Aviso", JOptionPane.WARNING_MESSAGE);
-					return;
-				}
+    private DateTimeFormatter formatoHora = DateTimeFormatter.ofPattern("HH:mm");
 
-				List<TurnoDTO> turnosAsignados = api.obtenerTurnosAsignados();
+    private boolean cargandoDatos = false;
 
-				TurnoDTO turnoNuevo = turnosActivos.get(indiceTurno);
+    public ModificarTurno(IApi api, JPanel panelContenedor, CardLayout cardLayout) {
 
-				PacienteDTO paciente = api.obtenerPacientePorDni(turno.getPaciente());
+        this.api = api;
 
-				try {
-					api.registrarTurno(medico, turnoNuevo, paciente);
-					api.liberarTurno(turno.getIdTurno());
-					JOptionPane.showMessageDialog(null, "Turno modificado con éxito.", "Éxito",
-							JOptionPane.INFORMATION_MESSAGE);
-					cardLayout.show(panelContenedor, "PANELDEFAULT");
-				} catch (DataEmptyException ex) {
-					JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-				}
-			}
-		});
-		pBotones.add(btnConfirmar);
+        setLayout(new BorderLayout(10, 10));
+        setBorder(new EmptyBorder(10, 20, 10, 20));
 
-		JButton btnCancelar = new JButton("Cancelar");
-		btnCancelar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				cardLayout.show(panelContenedor, "LISTADOTURNO");
-			}
-		});
-		pBotones.add(btnCancelar);
+        JLabel lblTitulo = new JLabel("Modificar Turno");
+        lblTitulo.setHorizontalAlignment(SwingConstants.CENTER);
+        lblTitulo.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 20));
+        add(lblTitulo, BorderLayout.NORTH);
 
-		JPanel pForm = new JPanel();
-		add(pForm, BorderLayout.CENTER);
-		GridBagLayout gbl_pForm = new GridBagLayout();
-		gbl_pForm.columnWidths = new int[]{223, 97, 180, 0};
-		gbl_pForm.rowHeights = new int[]{52, 27, 0, 25, 38, 25, 41, 25, 34, 25, 0, 0};
-		gbl_pForm.columnWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
-		gbl_pForm.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-		pForm.setLayout(gbl_pForm);
-		
-				JLabel lblIdTurno = new JLabel("ID Turno:");
-				GridBagConstraints gbc_lblIdTurno = new GridBagConstraints();
-				gbc_lblIdTurno.weightx = 1.0;
-				gbc_lblIdTurno.fill = GridBagConstraints.HORIZONTAL;
-				gbc_lblIdTurno.insets = new Insets(0, 0, 5, 5);
-				gbc_lblIdTurno.gridx = 1;
-				gbc_lblIdTurno.gridy = 1;
-				pForm.add(lblIdTurno, gbc_lblIdTurno);
-						
-								tfIdTurno = new JTextField();
-								tfIdTurno.setEditable(false);
-								tfIdTurno.setHorizontalAlignment(SwingConstants.CENTER);
-								GridBagConstraints gbc_tfIdTurno = new GridBagConstraints();
-								gbc_tfIdTurno.weightx = 1.0;
-								gbc_tfIdTurno.fill = GridBagConstraints.HORIZONTAL;
-								gbc_tfIdTurno.insets = new Insets(0, 0, 5, 5);
-								gbc_tfIdTurno.gridx = 1;
-								gbc_tfIdTurno.gridy = 2;
-								pForm.add(tfIdTurno, gbc_tfIdTurno);
-								tfIdTurno.setColumns(10);
-				
-						JLabel lblPaciente = new JLabel("Paciente:");
-						GridBagConstraints gbc_lblPaciente = new GridBagConstraints();
-						gbc_lblPaciente.weightx = 1.0;
-						gbc_lblPaciente.fill = GridBagConstraints.HORIZONTAL;
-						gbc_lblPaciente.insets = new Insets(0, 0, 5, 5);
-						gbc_lblPaciente.gridx = 1;
-						gbc_lblPaciente.gridy = 3;
-						pForm.add(lblPaciente, gbc_lblPaciente);
-								
-										cbPaciente = new JComboBox();
-										cbPaciente.setEditable(true);
-										GridBagConstraints gbc_cbPaciente = new GridBagConstraints();
-										gbc_cbPaciente.weightx = 1.0;
-										gbc_cbPaciente.fill = GridBagConstraints.HORIZONTAL;
-										gbc_cbPaciente.insets = new Insets(0, 0, 5, 5);
-										gbc_cbPaciente.gridx = 1;
-										gbc_cbPaciente.gridy = 4;
-										pForm.add(cbPaciente, gbc_cbPaciente);
-						
-								JLabel lblMedico = new JLabel("Especialidad:");
-								GridBagConstraints gbc_lblMedico = new GridBagConstraints();
-								gbc_lblMedico.fill = GridBagConstraints.BOTH;
-								gbc_lblMedico.insets = new Insets(0, 0, 5, 5);
-								gbc_lblMedico.gridx = 1;
-								gbc_lblMedico.gridy = 5;
-								pForm.add(lblMedico, gbc_lblMedico);
-						
-								cbEspecialidad = new JComboBox();
-								cbEspecialidad.setEditable(true);
-								GridBagConstraints gbc_cbEspecialidad = new GridBagConstraints();
-								gbc_cbEspecialidad.fill = GridBagConstraints.HORIZONTAL;
-								gbc_cbEspecialidad.insets = new Insets(0, 0, 5, 5);
-								gbc_cbEspecialidad.gridx = 1;
-								gbc_cbEspecialidad.gridy = 6;
-								pForm.add(cbEspecialidad, gbc_cbEspecialidad);
-				
-						JLabel lblNewLabel_1_1 = new JLabel("Médico:");
-						GridBagConstraints gbc_lblNewLabel_1_1 = new GridBagConstraints();
-						gbc_lblNewLabel_1_1.weightx = 1.0;
-						gbc_lblNewLabel_1_1.fill = GridBagConstraints.HORIZONTAL;
-						gbc_lblNewLabel_1_1.insets = new Insets(0, 0, 5, 5);
-						gbc_lblNewLabel_1_1.gridx = 1;
-						gbc_lblNewLabel_1_1.gridy = 7;
-						pForm.add(lblNewLabel_1_1, gbc_lblNewLabel_1_1);
-				
-						cbMedico = new JComboBox();
-						cbMedico.setEditable(true);
-						GridBagConstraints gbc_cbMedico = new GridBagConstraints();
-						gbc_cbMedico.weightx = 1.0;
-						gbc_cbMedico.fill = GridBagConstraints.HORIZONTAL;
-						gbc_cbMedico.insets = new Insets(0, 0, 5, 5);
-						gbc_cbMedico.gridx = 1;
-						gbc_cbMedico.gridy = 8;
-						pForm.add(cbMedico, gbc_cbMedico);
-		
-				JLabel lblTurnosDisponibles = new JLabel("Turnos Disponibles:");
-				GridBagConstraints gbc_lblTurnosDisponibles = new GridBagConstraints();
-				gbc_lblTurnosDisponibles.fill = GridBagConstraints.BOTH;
-				gbc_lblTurnosDisponibles.insets = new Insets(0, 0, 5, 5);
-				gbc_lblTurnosDisponibles.gridx = 1;
-				gbc_lblTurnosDisponibles.gridy = 9;
-				pForm.add(lblTurnosDisponibles, gbc_lblTurnosDisponibles);
-				
-						cbTurnosDisponibles = new JComboBox();
-						GridBagConstraints gbc_cbTurnosDisponibles = new GridBagConstraints();
-						gbc_cbTurnosDisponibles.weightx = 1.0;
-						gbc_cbTurnosDisponibles.insets = new Insets(0, 0, 0, 5);
-						gbc_cbTurnosDisponibles.fill = GridBagConstraints.HORIZONTAL;
-						gbc_cbTurnosDisponibles.gridx = 1;
-						gbc_cbTurnosDisponibles.gridy = 10;
-						pForm.add(cbTurnosDisponibles, gbc_cbTurnosDisponibles);
-	}
+        JPanel pForm = new JPanel(new GridBagLayout());
+        add(pForm, BorderLayout.CENTER);
 
-	public void datoTurnoActual(TurnoDTO turno) {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 12, 8, 12);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
 
-		this.turno = turno;
+        
+        JPanel panelPaciente = new JPanel(new GridBagLayout());
+        panelPaciente.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del turno actual"));
 
-		tfIdTurno.setText(String.valueOf(turno.getIdTurno()));
-		cbPaciente.setSelectedItem(turno.getPaciente());
-		MedicoDTO medico = this.api.obtenerMedico(turno.getMatriculaMedico());
+        GridBagConstraints gbcPaciente = new GridBagConstraints();
+        gbcPaciente.insets = new Insets(8, 8, 8, 8);
+        gbcPaciente.fill = GridBagConstraints.HORIZONTAL;
+        gbcPaciente.weightx = 1.0;
 
-		cbEspecialidad.setSelectedItem(medico.getEspecialidad().getNombre());
-		cbMedico.setSelectedItem(medico.getApellido() + ", " + medico.getNombre());
+        JLabel lblId = new JLabel("ID del turno:");
+        gbcPaciente.gridx = 0;
+        gbcPaciente.gridy = 0;
+        panelPaciente.add(lblId, gbcPaciente);
 
-		tfIdTurno.setEditable(false);
-		cbPaciente.setEditable(false);
-		cbEspecialidad.setEditable(false);
-		cbMedico.setEditable(false);
-		cargarTurnos(medico);
-	}
+        lblIdTurno = new JLabel("-");
+        gbcPaciente.gridy = 1;
+        panelPaciente.add(lblIdTurno, gbcPaciente);
 
-	private void cargarTurnos(MedicoDTO medico) {
-		cbTurnosDisponibles.removeAllItems();
+        JLabel lblPaciente = new JLabel("Paciente:");
+        gbcPaciente.gridy = 2;
+        panelPaciente.add(lblPaciente, gbcPaciente);
 
-		for (TurnoDTO t : medico.getTurnosDisponibles()) {
+        cbPaciente = new JComboBox<>();
+        cbPaciente.setEnabled(false);
+        cbPaciente.setPreferredSize(new java.awt.Dimension(250, 30));
+        gbcPaciente.gridy = 3;
+        panelPaciente.add(cbPaciente, gbcPaciente);
 
-			if (t.isActivo()) {
-				cbTurnosDisponibles.addItem(t.getFecha().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")));
-			}
-		}
-	}
+        
+        JPanel panelMedico = new JPanel(new GridBagLayout());
+        panelMedico.setBorder(javax.swing.BorderFactory.createTitledBorder("Nuevo turno"));
+
+        GridBagConstraints gbcMedico = new GridBagConstraints();
+        gbcMedico.insets = new Insets(8, 8, 8, 8);
+        gbcMedico.fill = GridBagConstraints.HORIZONTAL;
+        gbcMedico.weightx = 1.0;
+
+        JLabel lblEspecialidad = new JLabel("Especialidad:");
+        gbcMedico.gridx = 0;
+        gbcMedico.gridy = 0;
+        panelMedico.add(lblEspecialidad, gbcMedico);
+
+        cbEspecialidad = new JComboBox<>();
+        cbEspecialidad.setPreferredSize(new java.awt.Dimension(250, 30));
+
+        cbEspecialidad.addActionListener(e -> {
+            if (!cargandoDatos && cbEspecialidad.getSelectedItem() != null) {
+                recargarMedicos(cbEspecialidad.getSelectedItem().toString());
+            }
+        });
+
+        gbcMedico.gridy = 1;
+        panelMedico.add(cbEspecialidad, gbcMedico);
+
+        JLabel lblMedico = new JLabel("Médico:");
+        gbcMedico.gridy = 2;
+        panelMedico.add(lblMedico, gbcMedico);
+
+        cbMedico = new JComboBox<>();
+        cbMedico.setPreferredSize(new java.awt.Dimension(250, 30));
+
+        cbMedico.addActionListener(e -> {
+            if (!cargandoDatos) {
+                actualizarTablaTurnos();
+            }
+        });
+
+        gbcMedico.gridy = 3;
+        panelMedico.add(cbMedico, gbcMedico);
+
+        JLabel lblFecha = new JLabel("Fecha del turno:");
+        gbcMedico.gridy = 4;
+        panelMedico.add(lblFecha, gbcMedico);
+
+        calendario = new JDateChooser();
+        calendario.setDateFormatString("dd/MM/yyyy");
+        calendario.setMinSelectableDate(new Date());
+
+        calendario.addPropertyChangeListener("date", e -> {
+            if (!cargandoDatos) {
+                actualizarTablaTurnos();
+            }
+        });
+
+        gbcMedico.gridy = 5;
+        panelMedico.add(calendario, gbcMedico);
+
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.weightx = 1.0;
+        gbc.weighty = 0.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        pForm.add(panelPaciente, gbc);
+
+        gbc.gridx = 1;
+        pForm.add(panelMedico, gbc);
+
+        
+        JPanel panelHorarios = new JPanel(new BorderLayout(5, 5));
+        panelHorarios.setBorder(javax.swing.BorderFactory.createTitledBorder("Horarios disponibles"));
+
+        modeloTurnos = new DefaultTableModel(new Object[][] {}, new String[] { "Horario", "Disponibilidad" }) {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        tablaTurnos = new JTable(modeloTurnos);
+        tablaTurnos.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        tablaTurnos.setRowHeight(25);
+
+        tablaTurnos.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                int fila = tablaTurnos.getSelectedRow();
+
+                if (fila >= 0 && fila < turnosFiltrados.size()) {
+                    turnoSeleccionado = turnosFiltrados.get(fila);
+                } else {
+                    turnoSeleccionado = null;
+                }
+            }
+        });
+
+        JScrollPane scrollTabla = new JScrollPane(tablaTurnos);
+        scrollTabla.setPreferredSize(new java.awt.Dimension(500, 180));
+        panelHorarios.add(scrollTabla, BorderLayout.CENTER);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        gbc.gridwidth = 2;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.insets = new Insets(12, 12, 8, 12);
+        pForm.add(panelHorarios, gbc);
+
+        // Botones
+        JPanel pBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
+
+        JButton btnConfirmar = new JButton("Confirmar");
+        btnConfirmar.addActionListener(e -> confirmarModificacion(cardLayout, panelContenedor));
+        pBotones.add(btnConfirmar);
+
+        JButton btnCancelar = new JButton("Cancelar");
+        btnCancelar.addActionListener(e -> cardLayout.show(panelContenedor, "LISTADOTURNO"));
+        pBotones.add(btnCancelar);
+
+        add(pBotones, BorderLayout.SOUTH);
+    }
+
+    public void datoTurnoActual(TurnoDTO turno) {
+
+        this.turno = turno;
+
+        cargarDatosIniciales();
+    }
+
+    private void cargarDatosIniciales() {
+
+        if (turno == null) {
+            return;
+        }
+
+        cargandoDatos = true;
+
+        especialidades = api.obtenerEspecialidades();
+        medicos = api.obtenerMedicos();
+
+        if (especialidades == null) {
+            especialidades = new java.util.HashSet<>();
+        }
+
+        if (medicos == null) {
+            medicos = new ArrayList<>();
+        }
+
+        lblIdTurno.setText(String.valueOf(turno.getIdTurno()));
+
+        cbPaciente.removeAllItems();
+
+        PacienteDTO paciente = api.obtenerPacientePorDni(turno.getPaciente());
+
+        if (paciente != null) {
+            cbPaciente.addItem(paciente.getNombre() + " " + paciente.getApellido());
+        }
+
+        cbEspecialidad.removeAllItems();
+
+        for (EspecialidadDTO especialidad : especialidades) {
+            cbEspecialidad.addItem(especialidad.getNombre());
+        }
+
+        MedicoDTO medicoActual = api.obtenerMedico(turno.getMatriculaMedico());
+
+        if (medicoActual != null) {
+            cbEspecialidad.setSelectedItem(medicoActual.getEspecialidad().getNombre());
+        }
+
+       
+        Date fechaOriginal = Date.from(turno.getFecha().atZone(ZoneId.systemDefault()).toInstant());
+
+        calendario.setDate(fechaOriginal);
+
+        cargandoDatos = false;
+
+        if (medicoActual != null) {
+            recargarMedicos(medicoActual.getMatricula());
+        }
+    }
+
+    private void recargarMedicos(String matriculaSeleccionada) {
+
+        cargandoDatos = true;
+
+        cbMedico.removeAllItems();
+
+        modeloTurnos.setRowCount(0);
+        turnosFiltrados.clear();
+        turnoSeleccionado = null;
+
+        String especialidad = (String) cbEspecialidad.getSelectedItem();
+
+        if (especialidad == null) {
+            cargandoDatos = false;
+            return;
+        }
+
+        medicosFiltrados = medicos.stream()
+                .filter(m -> m.getEspecialidad().getNombre().equals(especialidad))
+                .collect(Collectors.toList());
+
+        for (MedicoDTO medico : medicosFiltrados) {
+            cbMedico.addItem(medico.getApellido() + ", " + medico.getNombre());
+        }
+
+        if (matriculaSeleccionada != null) {
+            for (int i = 0; i < medicosFiltrados.size(); i++) {
+                if (medicosFiltrados.get(i).getMatricula().equals(matriculaSeleccionada)) {
+                    cbMedico.setSelectedIndex(i);
+                    break;
+                }
+            }
+        }
+
+        cargandoDatos = false;
+
+        actualizarTablaTurnos();
+    }
+
+    private void actualizarTablaTurnos() {
+
+        modeloTurnos.setRowCount(0);
+        turnosFiltrados.clear();
+        turnoSeleccionado = null;
+
+        int indiceMedico = cbMedico.getSelectedIndex();
+        Date fechaSeleccionada = calendario.getDate();
+
+        if (indiceMedico < 0 || indiceMedico >= medicosFiltrados.size() || fechaSeleccionada == null) {
+            return;
+        }
+
+        MedicoDTO medico = medicosFiltrados.get(indiceMedico);
+
+        LocalDate fecha = fechaSeleccionada.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate();
+
+        LocalDateTime ahora = LocalDateTime.now();
+
+        for (TurnoDTO t : medico.getTurnosDisponibles()) {
+
+            if (t.isActivo()
+                    && t.getFecha().toLocalDate().equals(fecha)
+                    && t.getFecha().isAfter(ahora)) {
+
+                turnosFiltrados.add(t);
+
+                modeloTurnos.addRow(new Object[] {
+                        t.getFecha().format(formatoHora),
+                        "Disponible"
+                });
+            }
+        }
+    }
+
+    private void confirmarModificacion(CardLayout cardLayout, JPanel panelContenedor) {
+
+        int indiceMedico = cbMedico.getSelectedIndex();
+
+        if (indiceMedico < 0 || turnoSeleccionado == null) {
+            JOptionPane.showMessageDialog(null, "Seleccione un médico y un horario disponible.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        if (turnoSeleccionado.getIdTurno() == turno.getIdTurno()) {
+            JOptionPane.showMessageDialog(null, "Seleccione un horario diferente al turno actual.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        MedicoDTO medicoNuevo = medicosFiltrados.get(indiceMedico);
+
+        PacienteDTO paciente = api.obtenerPacientePorDni(turno.getPaciente());
+
+        try {
+
+            api.registrarTurno(medicoNuevo, turnoSeleccionado, paciente);
+
+            api.liberarTurno(turno.getIdTurno());
+
+            JOptionPane.showMessageDialog(null, "Turno modificado con éxito.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+
+            cardLayout.show(panelContenedor, "LISTADOTURNO");
+
+        } catch (DataEmptyException | IllegalArgumentException ex) {
+
+            JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 }

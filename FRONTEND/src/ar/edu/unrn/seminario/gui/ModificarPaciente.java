@@ -98,12 +98,14 @@ public class ModificarPaciente extends JPanel {
 
 					api.modificarPaciente(nombre, apellido, dni, oSocial.getCodigo());
 					limpiarCampos();
-					JOptionPane.showMessageDialog(null, "Paciente modificado con exito!", "Info",
-							JOptionPane.INFORMATION_MESSAGE);
+					JOptionPane.showMessageDialog(null, "Paciente modificado con exito!", "Info",JOptionPane.INFORMATION_MESSAGE);
 					cardLayout.show(panelContenedor, "LISTADOPACIENTE");
 
 				} catch (DataEmptyException ex) {
 					JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+				} catch (DniErroneoException ex) {
+					JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+					
 				}
 			}
 		});
