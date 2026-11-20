@@ -25,6 +25,7 @@ import ar.edu.unrn.seminario.dto.ObraSocialDTO;
 import ar.edu.unrn.seminario.exception.DataEmptyException;
 import ar.edu.unrn.seminario.exception.DniErroneoException;
 import ar.edu.unrn.seminario.exception.DniUnicoException;
+import ar.edu.unrn.seminario.exception.PersistenceException;
 
 public class AltaPaciente extends JPanel {
 
@@ -173,7 +174,12 @@ public class AltaPaciente extends JPanel {
 
             } catch (DniUnicoException ex) {
                 JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                
+            } catch (PersistenceException ex) {
+                JOptionPane.showMessageDialog(null, ex.getMessage(), "Error de persistencia", JOptionPane.ERROR_MESSAGE);
             }
+            
+            
         });
 
         panelBotones.add(btnRegistrar);

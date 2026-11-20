@@ -18,11 +18,14 @@ import ar.edu.unrn.seminario.api.IApi;
 import ar.edu.unrn.seminario.dto.MedicoDTO;
 import ar.edu.unrn.seminario.dto.PacienteDTO;
 import ar.edu.unrn.seminario.dto.TurnoDTO;
+import ar.edu.unrn.seminario.exception.PersistenceException;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.time.format.DateTimeFormatter;
 import java.awt.event.ActionEvent;
+import javax.swing.JOptionPane;
 
 public class HistoriaClinica extends JPanel {
 
@@ -88,17 +91,29 @@ public class HistoriaClinica extends JPanel {
 	}
 
 	public void actualizarTabla() {
-		modelo.setRowCount(0);
-		MedicoDTO medico;
-		PacienteDTO paciente = this.api.obtenerPacientePorDni(dniPacienteActual);
-		
-		for (TurnoDTO t : this.historiaClinica) {
-			medico = this.api.obtenerMedico(t.getMedico());
-			//paciente = this.api.obtenerPacientePorDni(t.getPaciente());
-			modelo.addRow(
-					new Object[] { t.getIdTurno(), t.getFecha().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
-							paciente.getApellido() + ", " + paciente.getNombre(), paciente.getDni(), medico.getApellido() + ", " + medico.getNombre() });
-		}
+	    modelo.setRowCount(0);
+
+	    try {
+	        MedicoDTO medico;
+	        PacienteDTO paciente = this.api.obtenerPacientePorDni(dniPacienteActual);
+
+	        for (TurnoDTO t : this.historiaClinica) {
+	            medico = this.api.obtenerMedico(t.getMedico());
+
+	            modelo.addRow(
+	                new Object[] {
+	                    t.getIdTurno(),
+	                    t.getFecha().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
+	                    paciente.getApellido() + ", " + paciente.getNombre(),
+	                    paciente.getDni(),
+	                    medico.getApellido() + ", " + medico.getNombre()
+	                }
+	            );
+	        }
+
+	    } catch (PersistenceException ex) {
+	        JOptionPane.showMessageDialog(this, ex.getMessage(), "Error de persistencia", JOptionPane.ERROR_MESSAGE);
+	    }
 	}
 
 }

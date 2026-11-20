@@ -14,38 +14,31 @@ public class Medico extends Persona {
 	private Usuario usuario;
 	private String matricula;
 	private Especialidad especialidad;
-	private List<Turno> turnosDisponibles = new ArrayList<>();
+	
 
 	public Medico(String nombre, String apellido, int dni, String matricula, Especialidad especialidad)
 	        throws DataEmptyException, DniErroneoException {
 	    super(nombre, apellido, dni);
 	    this.especialidad = especialidad;
 	    this.matricula = matricula;
-	    this.turnosDisponibles = new ArrayList<>();
+	   
 	}
 
-	public List<Turno> generarTurnosSemanales() throws DataEmptyException {
+	public List<Turno> generarTurnos(LocalDate fecha) throws DataEmptyException {
 
-	    List<Turno> turnos = new ArrayList<>();
+	    List<Turno> turnos = new ArrayList<Turno>();
 
 	    LocalDateTime ahora = LocalDateTime.now();
-	    LocalDateTime fin = ahora.plusWeeks(1);
-
-	    LocalDate fechaActual = ahora.toLocalDate();
 
 	    LocalTime horaInicio = LocalTime.of(9, 0);
 	    LocalTime horaFin = LocalTime.of(18, 0);
 
-	    LocalDateTime control = fechaActual.atTime(horaInicio);
+	    LocalDateTime control = fecha.atTime(horaInicio);
 
-	    while (control.isBefore(fin)) {
+	    while (control.toLocalTime().isBefore(horaFin)) {
 
-	        LocalTime horaTurno = control.toLocalTime();
-
-	        if (!control.isBefore(ahora) && !horaTurno.isBefore(horaInicio) && horaTurno.isBefore(horaFin)) {
-
+	        if (control.isAfter(ahora)) {
 	            Turno turno = new Turno(0, control, this.getMatricula(), true);
-
 	            turnos.add(turno);
 	        }
 
@@ -79,11 +72,5 @@ public class Medico extends Persona {
 		this.especialidad = especialidad;
 	}
 
-	public List<Turno> getTurnosDisponibles() {
-		return turnosDisponibles;
-	}
-
-	public void setTurnosDisponibles(List<Turno> turnosDisponibles) {
-		this.turnosDisponibles = turnosDisponibles;
-	}
+	
 }

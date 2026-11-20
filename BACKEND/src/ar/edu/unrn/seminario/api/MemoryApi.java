@@ -1,5 +1,6 @@
 package ar.edu.unrn.seminario.api;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -179,15 +180,17 @@ public class MemoryApi implements IApi {
 			throws DataEmptyException {
 		Medico medico = this.buscarMedico(medicoTurno.getMatricula());
 		Paciente paciente = this.buscarPaciente(pacienteTurno.getDni());
-
-		for (Turno t : medico.getTurnosDisponibles()) {
+             
+		/*for (Turno t : medico.getTurnosDisponibles()) {
 			if (t.getFecha().equals(turnoElegido.getFecha())) {
 				t.setActivo(false);
 				t.setDniPaciente(paciente.getDni());
 				paciente.agregarTurnoHistoriaClinica(t);
+	
 				this.turnosAsignados.add(t);
 			}
-		}
+			
+		}*/
 
 	}
 
@@ -239,11 +242,11 @@ public class MemoryApi implements IApi {
 	@Override
 	public List<MedicoDTO> obtenerMedicos() {
 		List<MedicoDTO> dtos = new ArrayList<>();
-
+/*
 		for (Medico m : this.medicos) {
 			dtos.add(new MedicoDTO(m.getNombre(), m.getApellido(), m.getDni(), m.getMatricula(),
 					this.obtenerEspecialidad(m.getEspecialidad().getCodigo()), this.obtenerTurnosDisponibles(m)));
-		}
+		}*/
 		return dtos;
 	}
 
@@ -291,10 +294,12 @@ public class MemoryApi implements IApi {
 
 	@Override
 	public MedicoDTO obtenerMedico(String matricula) {
-		MedicoDTO medicoDTO = this.medicos.stream().filter(medico -> medico.getMatricula() == matricula).findFirst()
+		MedicoDTO medicoDTO =  new MedicoDTO(matricula, matricula, 0, matricula, null);
+				
+				/*this.medicos.stream().filter(medico -> medico.getMatricula() == matricula).findFirst()
 				.map(m -> new MedicoDTO(m.getNombre(), m.getApellido(), m.getDni(), m.getMatricula(),
 						this.obtenerEspecialidad(m.getEspecialidad().getCodigo()), this.obtenerTurnosDisponibles(m)))
-				.orElse(null);
+				.orElse(null);*/
 
 		return medicoDTO;
 	}
@@ -309,10 +314,13 @@ public class MemoryApi implements IApi {
 
 	public List<TurnoDTO> obtenerTurnosDisponibles(Medico medico) {
 		List<TurnoDTO> dtos = new ArrayList<>();
-		for (Turno t : medico.getTurnosDisponibles()) {
+		/*for (Turno t : medico.getTurnosDisponibles()) {
 			dtos.add(turnoMapper.transformar(t));
 		}
+		*/
+		
 		return dtos;
+		
 	}
 
 	@Override
@@ -464,10 +472,11 @@ public class MemoryApi implements IApi {
 
 	}
 
+
 	@Override
-	public void generarTurnosSemanales() throws DataEmptyException {
+	public List<TurnoDTO> obtenerHorariosDisponibles(String matricula, LocalDate fecha) {
 		// TODO Auto-generated method stub
-		
+		return null;
 	}
 
 	

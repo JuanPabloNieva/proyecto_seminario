@@ -1,3 +1,4 @@
+
 package ar.edu.unrn.seminario.gui;
 
 import javax.swing.JPanel;
@@ -16,6 +17,7 @@ import ar.edu.unrn.seminario.dto.ObraSocialDTO;
 import ar.edu.unrn.seminario.dto.PacienteDTO;
 import ar.edu.unrn.seminario.exception.DataEmptyException;
 import ar.edu.unrn.seminario.exception.DniErroneoException;
+import ar.edu.unrn.seminario.exception.PersistenceException;
 
 import javax.swing.JComboBox;
 import javax.swing.JButton;
@@ -25,121 +27,125 @@ import javax.swing.SwingConstants;
 
 public class ModificarPaciente extends JPanel {
 
-	private static final long serialVersionUID = 1L;
-	private JTextField tfNombre;
-	private JTextField tfApellido;
-	private JTextField tfDni;
-	JComboBox<String> cbObraSocial;
+    private static final long serialVersionUID = 1L;
 
-	private List<ObraSocialDTO> obrasSociales = new ArrayList<>();
+    private JTextField tfNombre;
+    private JTextField tfApellido;
+    private JTextField tfDni;
+    JComboBox<String> cbObraSocial;
 
-	/**
-	 * Create the panel.
-	 */
-	public ModificarPaciente(IApi api, JPanel panelContenedor, CardLayout cardLayout) {
+    private List<ObraSocialDTO> obrasSociales = new ArrayList<>();
 
-		this.obrasSociales = api.obtenerObrasSociales();
-		setLayout(null);
+    public ModificarPaciente(IApi api, JPanel panelContenedor, CardLayout cardLayout) {
 
-		JLabel lblNombre = new JLabel("Nombre:");
-		lblNombre.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		lblNombre.setBounds(199, 167, 75, 25);
-		add(lblNombre);
+        try {
+            this.obrasSociales = api.obtenerObrasSociales();
+        } catch (PersistenceException ex) {
+            JOptionPane.showMessageDialog(null, ex.getMessage(), "Error de persistencia", JOptionPane.ERROR_MESSAGE);
+        }
 
-		tfNombre = new JTextField();
-		tfNombre.setColumns(10);
-		tfNombre.setBounds(284, 171, 158, 20);
-		add(tfNombre);
+        setLayout(null);
 
-		JLabel lblApellido = new JLabel("Apellido:");
-		lblApellido.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		lblApellido.setBounds(199, 203, 75, 25);
-		add(lblApellido);
+        JLabel lblNombre = new JLabel("Nombre:");
+        lblNombre.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        lblNombre.setBounds(199, 167, 75, 25);
+        add(lblNombre);
 
-		tfApellido = new JTextField();
-		tfApellido.setColumns(10);
-		tfApellido.setBounds(284, 207, 158, 20);
-		add(tfApellido);
+        tfNombre = new JTextField();
+        tfNombre.setColumns(10);
+        tfNombre.setBounds(284, 171, 158, 20);
+        add(tfNombre);
 
-		JLabel lblDNI = new JLabel("DNI:");
-		lblDNI.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		lblDNI.setBounds(199, 239, 75, 25);
-		add(lblDNI);
+        JLabel lblApellido = new JLabel("Apellido:");
+        lblApellido.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        lblApellido.setBounds(199, 203, 75, 25);
+        add(lblApellido);
 
-		tfDni = new JTextField();
-		tfDni.setEditable(false);
-		tfDni.setColumns(10);
-		tfDni.setBounds(284, 243, 158, 20);
-		add(tfDni);
+        tfApellido = new JTextField();
+        tfApellido.setColumns(10);
+        tfApellido.setBounds(284, 207, 158, 20);
+        add(tfApellido);
 
-		JLabel lblObraSocial = new JLabel("Obra social:");
-		lblObraSocial.setFont(new Font("Tahoma", Font.PLAIN, 14));
-		lblObraSocial.setBounds(199, 275, 75, 25);
-		add(lblObraSocial);
+        JLabel lblDNI = new JLabel("DNI:");
+        lblDNI.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        lblDNI.setBounds(199, 239, 75, 25);
+        add(lblDNI);
 
-		cbObraSocial = new JComboBox<String>();
-		cbObraSocial.setBounds(284, 275, 158, 25);
-		add(cbObraSocial);
+        tfDni = new JTextField();
+        tfDni.setEditable(false);
+        tfDni.setColumns(10);
+        tfDni.setBounds(284, 243, 158, 20);
+        add(tfDni);
 
-		for (ObraSocialDTO os : this.obrasSociales) {
-			cbObraSocial.addItem(os.getNombre());
-		}
+        JLabel lblObraSocial = new JLabel("Obra social:");
+        lblObraSocial.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        lblObraSocial.setBounds(199, 275, 75, 25);
+        add(lblObraSocial);
 
-		JButton btnGuardarCambios = new JButton("Guardar Cambios");
-		btnGuardarCambios.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				ObraSocialDTO oSocial = obrasSociales.get(cbObraSocial.getSelectedIndex());
+        cbObraSocial = new JComboBox<String>();
+        cbObraSocial.setBounds(284, 275, 158, 25);
+        add(cbObraSocial);
 
-				try {
-					String nombre = tfNombre.getText().trim();
-					String apellido = tfApellido.getText().trim();
-					String dniTxt = tfDni.getText().trim();
-					int dni = Integer.parseInt(dniTxt);
+        for (ObraSocialDTO os : this.obrasSociales) {
+            cbObraSocial.addItem(os.getNombre());
+        }
 
-					api.modificarPaciente(nombre, apellido, dni, oSocial.getCodigo());
-					limpiarCampos();
-					JOptionPane.showMessageDialog(null, "Paciente modificado con exito!", "Info",JOptionPane.INFORMATION_MESSAGE);
-					cardLayout.show(panelContenedor, "LISTADOPACIENTE");
+        JButton btnGuardarCambios = new JButton("Guardar Cambios");
+        btnGuardarCambios.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                ObraSocialDTO oSocial = obrasSociales.get(cbObraSocial.getSelectedIndex());
 
-				} catch (DataEmptyException ex) {
-					JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-				} catch (DniErroneoException ex) {
-					JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-					
-				}
-			}
-		});
-		btnGuardarCambios.setBounds(221, 346, 134, 23);
-		add(btnGuardarCambios);
+                try {
+                    String nombre = tfNombre.getText().trim();
+                    String apellido = tfApellido.getText().trim();
+                    String dniTxt = tfDni.getText().trim();
+                    int dni = Integer.parseInt(dniTxt);
 
-		JButton btnCancelar = new JButton("Cancelar");
-		btnCancelar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				limpiarCampos();
-				cardLayout.show(panelContenedor, "LISTADOPACIENTE");
-			}
-		});
-		btnCancelar.setBounds(365, 346, 134, 23);
-		add(btnCancelar);
+                    api.modificarPaciente(nombre, apellido, dni, oSocial.getCodigo());
+                    limpiarCampos();
 
-		JLabel lblModificarPaciente = new JLabel("Modificar Paciente");
-		lblModificarPaciente.setHorizontalAlignment(SwingConstants.CENTER);
-		lblModificarPaciente.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 15));
-		lblModificarPaciente.setBounds(284, 74, 158, 12);
-		add(lblModificarPaciente);
+                    JOptionPane.showMessageDialog(null, "Paciente modificado con exito!", "Info", JOptionPane.INFORMATION_MESSAGE);
+                    cardLayout.show(panelContenedor, "LISTADOPACIENTE");
 
-	}
+                } catch (DataEmptyException ex) {
+                    JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                } catch (DniErroneoException ex) {
+                    JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                } catch (PersistenceException ex) {
+                    JOptionPane.showMessageDialog(null, ex.getMessage(), "Error de persistencia", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+        btnGuardarCambios.setBounds(221, 346, 134, 23);
+        add(btnGuardarCambios);
 
-	public void datoPacienteActual(PacienteDTO paciente) {
-		tfNombre.setText(paciente.getNombre());
-		tfApellido.setText(paciente.getApellido());
-		tfDni.setText(String.valueOf(paciente.getDni()));
-		cbObraSocial.setSelectedItem(paciente.getObraSocial());
-	}
+        JButton btnCancelar = new JButton("Cancelar");
+        btnCancelar.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                limpiarCampos();
+                cardLayout.show(panelContenedor, "LISTADOPACIENTE");
+            }
+        });
+        btnCancelar.setBounds(365, 346, 134, 23);
+        add(btnCancelar);
 
-	private void limpiarCampos() {
-		tfNombre.setText("");
-		tfApellido.setText("");
-		tfDni.setText("");
-	}
+        JLabel lblModificarPaciente = new JLabel("Modificar Paciente");
+        lblModificarPaciente.setHorizontalAlignment(SwingConstants.CENTER);
+        lblModificarPaciente.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 15));
+        lblModificarPaciente.setBounds(284, 74, 158, 12);
+        add(lblModificarPaciente);
+    }
+
+    public void datoPacienteActual(PacienteDTO paciente) {
+        tfNombre.setText(paciente.getNombre());
+        tfApellido.setText(paciente.getApellido());
+        tfDni.setText(String.valueOf(paciente.getDni()));
+        cbObraSocial.setSelectedItem(paciente.getObraSocial());
+    }
+
+    private void limpiarCampos() {
+        tfNombre.setText("");
+        tfApellido.setText("");
+        tfDni.setText("");
+    }
 }

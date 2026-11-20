@@ -6,68 +6,61 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 import ar.edu.unrn.seminario.exception.DataEmptyException;
+import ar.edu.unrn.seminario.exception.PersistenceException;
 import ar.edu.unrn.seminario.modelo.Turno;
 
 public class TurnoDAOJDBC implements TurnoDao {
 
     @Override
     public void create(Turno turno) {
-        String sql = "INSERT INTO turnos " + "(fecha, matricula_medico, dni_paciente, activo) "  + "VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO turnos (fecha, matricula_medico, dni_paciente, activo) VALUES (?, ?, ?, ?)";
 
         try {
             Connection conn = ConnectionManager.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
 
-            ps.setTimestamp(1, Timestamp.valueOf(turno.getFecha()));
-            ps.setString(2, turno.getMatriculaMedico());
-
-            if (turno.getDniPaciente() == null) {
-                ps.setNull(3, java.sql.Types.INTEGER);
-            } else {
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setTimestamp(1, Timestamp.valueOf(turno.getFecha()));
+                ps.setString(2, turno.getMatriculaMedico());
                 ps.setInt(3, turno.getDniPaciente());
+
+                ps.setBoolean(4, turno.isActivo());
+
+                ps.executeUpdate();
             }
 
-            ps.setBoolean(4, turno.isActivo());
-
-            ps.executeUpdate();
-            ps.close();
-
         } catch (SQLException e) {
-            throw new RuntimeException("Error al registrar el turno", e);
+            throw new PersistenceException("Error al registrar el turno", e);
+        } finally {
+            ConnectionManager.disconnect();
         }
     }
 
-    @Override
-    public void update(Turno turno) {
-        String sql = "UPDATE turnos SET fecha = ?, matricula_medico = ?, " + "dni_paciente = ?, activo = ? WHERE id_turno = ?";
 
-        try {
-            Connection conn = ConnectionManager.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
-
+@Override
+public void update(Turno turno) {
+    String sql = "UPDATE turnos SET fecha = ?, matricula_medico = ?, dni_paciente = ?, activo = ? WHERE id_turno = ?";
+    try {
+        Connection conn = ConnectionManager.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setTimestamp(1, Timestamp.valueOf(turno.getFecha()));
             ps.setString(2, turno.getMatriculaMedico());
-
-            if (turno.getDniPaciente() == null) {
-                ps.setNull(3, java.sql.Types.INTEGER);
-            } else {
-                ps.setInt(3, turno.getDniPaciente());
-            }
-
+            ps.setInt(3, turno.getDniPaciente());
             ps.setBoolean(4, turno.isActivo());
             ps.setInt(5, turno.getIdTurno());
-
             ps.executeUpdate();
-            ps.close();
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Error al modificar el turno", e);
         }
+    } catch (SQLException e) {
+        throw new PersistenceException("Error al modificar el turno", e);
+    } finally {
+        ConnectionManager.disconnect();
     }
+}
+
 
     @Override
     public void remove(Integer idTurno) {
@@ -75,14 +68,16 @@ public class TurnoDAOJDBC implements TurnoDao {
 
         try {
             Connection conn = ConnectionManager.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
 
-            ps.setInt(1, idTurno);
-            ps.executeUpdate();
-            ps.close();
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, idTurno);
+                ps.executeUpdate();
+            }
 
         } catch (SQLException e) {
-            throw new RuntimeException("Error al eliminar el turno", e);
+            throw new PersistenceException("Error al eliminar el turno", e);
+        } finally {
+            ConnectionManager.disconnect();
         }
     }
 
@@ -92,25 +87,24 @@ public class TurnoDAOJDBC implements TurnoDao {
 
         try {
             Connection conn = ConnectionManager.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
-
-            ps.setInt(1, idTurno);
-
-            ResultSet rs = ps.executeQuery();
-
             Turno turno = null;
 
-            if (rs.next()) {
-                turno = mapearTurno(rs);
-            }
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, idTurno);
 
-            rs.close();
-            ps.close();
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        turno = mapearTurno(rs);
+                    }
+                }
+            }
 
             return turno;
 
         } catch (SQLException e) {
-            throw new RuntimeException("Error al buscar el turno", e);
+            throw new PersistenceException("Error al buscar el turno", e);
+        } finally {
+            ConnectionManager.disconnect();
         }
     }
 
@@ -122,19 +116,19 @@ public class TurnoDAOJDBC implements TurnoDao {
 
         try {
             Connection conn = ConnectionManager.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
 
-            ResultSet rs = ps.executeQuery();
+            try (PreparedStatement ps = conn.prepareStatement(sql);
+                 ResultSet rs = ps.executeQuery()) {
 
-            while (rs.next()) {
-                turnos.add(mapearTurno(rs));
+                while (rs.next()) {
+                    turnos.add(mapearTurno(rs));
+                }
             }
 
-            rs.close();
-            ps.close();
-
         } catch (SQLException e) {
-            throw new RuntimeException("Error al listar los turnos", e);
+            throw new PersistenceException("Error al listar los turnos", e);
+        } finally {
+            ConnectionManager.disconnect();
         }
 
         return turnos;
@@ -142,27 +136,27 @@ public class TurnoDAOJDBC implements TurnoDao {
 
     @Override
     public List<Turno> findByMedico(String matricula) {
-        String sql = "SELECT * FROM turnos " + "WHERE matricula_medico = ? ORDER BY fecha";
+        String sql = "SELECT * FROM turnos WHERE matricula_medico = ? ORDER BY fecha";
 
         List<Turno> turnos = new ArrayList<Turno>();
 
         try {
             Connection conn = ConnectionManager.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
 
-            ps.setString(1, matricula);
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setString(1, matricula);
 
-            ResultSet rs = ps.executeQuery();
-
-            while (rs.next()) {
-                turnos.add(mapearTurno(rs));
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        turnos.add(mapearTurno(rs));
+                    }
+                }
             }
 
-            rs.close();
-            ps.close();
-
         } catch (SQLException e) {
-            throw new RuntimeException("Error al buscar los turnos del médico", e);
+            throw new PersistenceException("Error al buscar los turnos del médico", e);
+        } finally {
+            ConnectionManager.disconnect();
         }
 
         return turnos;
@@ -192,29 +186,52 @@ public class TurnoDAOJDBC implements TurnoDao {
         }
     }
 
-    @Override
+    /*@Override
     public void eliminarTurnosDisponiblesVencidos() {
-
-        String sql = "DELETE FROM turnos "
-                   + "WHERE fecha < NOW() "
-                   + "AND dni_paciente IS NULL";
+        String sql = "DELETE FROM turnos WHERE fecha < NOW() AND dni_paciente IS NULL";
 
         try {
             Connection conn = ConnectionManager.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
 
-            int eliminados = ps.executeUpdate();
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                int eliminados = ps.executeUpdate();
 
-            System.out.println(
-                "Turnos disponibles vencidos eliminados: " + eliminados
-            );
-
-            ps.close();
+                System.out.println("Turnos disponibles vencidos eliminados: " + eliminados);
+            }
 
         } catch (SQLException e) {
-            throw new RuntimeException(
-                "Error al eliminar turnos disponibles vencidos", e
-            );
+            throw new PersistenceException("Error al eliminar turnos disponibles vencidos", e);
+        } finally {
+            ConnectionManager.disconnect();
         }
+    }*/
+
+    @Override
+    public List<Turno> findByMedicoYFecha(String matricula, LocalDate fecha) {
+        String sql = "SELECT * FROM turnos WHERE matricula_medico = ? AND DATE(fecha) = ? ORDER BY fecha";
+
+        List<Turno> turnos = new ArrayList<Turno>();
+
+        try {
+            Connection conn = ConnectionManager.getConnection();
+
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setString(1, matricula);
+                ps.setDate(2, java.sql.Date.valueOf(fecha));
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        turnos.add(mapearTurno(rs));
+                    }
+                }
+            }
+
+        } catch (SQLException e) {
+            throw new PersistenceException("Error al buscar los turnos del médico para la fecha indicada", e);
+        } finally {
+            ConnectionManager.disconnect();
+        }
+
+        return turnos;
     }
 }

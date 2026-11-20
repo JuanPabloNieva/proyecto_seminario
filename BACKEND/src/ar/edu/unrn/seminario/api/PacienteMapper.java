@@ -1,3 +1,4 @@
+
 package ar.edu.unrn.seminario.api;
 
 import java.util.List;
@@ -11,23 +12,32 @@ import ar.edu.unrn.seminario.modelo.Paciente;
 
 public class PacienteMapper {
 
-	private final HistoriaMapper hMapper = new HistoriaMapper();
+    private final HistoriaMapper hMapper = new HistoriaMapper();
 
-	public PacienteDTO transformar(Paciente paciente) {
+   
+    public PacienteDTO transformar(Paciente paciente) {
 
-		List<TurnoDTO> historiaClinica = hMapper.transformar(paciente.getHistoriaClinica());
+        List<TurnoDTO> historiaClinica = hMapper.transformar(paciente.getHistoriaClinica());
 
-		return new PacienteDTO(paciente.getNombre(), paciente.getApellido(), paciente.getDni(),
-				paciente.getObraSocial().getNombre(), historiaClinica);
-	}
+        return transformar(paciente, historiaClinica);
+    }
 
-	public Paciente transformar(PacienteDTO pacienteDTO, List<Paciente> pacientes) {
-		Paciente paciente = pacientes.stream().filter(p -> (p.getDni() == pacienteDTO.getDni())).findFirst()
-				.orElse(null);
-		return paciente;
-	}
+   
+    public PacienteDTO transformar(Paciente paciente, List<TurnoDTO> historiaClinica) {
 
-	public Paciente transformar(PacienteDTO pacienteDTO, ObraSocial os) throws DataEmptyException,DniErroneoException {
-		return new Paciente(pacienteDTO.getNombre(), pacienteDTO.getApellido(), pacienteDTO.getDni(), os);
-	}
+        return new PacienteDTO( paciente.getNombre(), paciente.getApellido(), paciente.getDni(), paciente.getObraSocial().getNombre(), historiaClinica);
+    }
+
+    public Paciente transformar(PacienteDTO pacienteDTO, List<Paciente> pacientes) {
+
+        Paciente paciente = pacientes.stream().filter(p -> p.getDni() == pacienteDTO.getDni()).findFirst().orElse(null);
+
+        return paciente;
+    }
+
+    public Paciente transformar(PacienteDTO pacienteDTO, ObraSocial os)
+            throws DataEmptyException, DniErroneoException {
+
+        return new Paciente(pacienteDTO.getNombre(), pacienteDTO.getApellido(), pacienteDTO.getDni(), os);
+    }
 }

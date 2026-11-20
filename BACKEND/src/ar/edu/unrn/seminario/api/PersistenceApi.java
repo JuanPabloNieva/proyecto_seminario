@@ -16,6 +16,8 @@ import ar.edu.unrn.seminario.dto.UsuarioDTO;
 import ar.edu.unrn.seminario.exception.DataEmptyException;
 import ar.edu.unrn.seminario.exception.DniErroneoException;
 import ar.edu.unrn.seminario.exception.DniUnicoException;
+import ar.edu.unrn.seminario.exception.OperationException;
+import ar.edu.unrn.seminario.exception.PersistenceException;
 import ar.edu.unrn.seminario.modelo.Especialidad;
 import ar.edu.unrn.seminario.modelo.Medico;
 import ar.edu.unrn.seminario.modelo.ObraSocial;
@@ -53,7 +55,7 @@ public class PersistenceApi implements IApi {
     private final PacienteMapper pacienteMapper = new PacienteMapper();
     private final HistoriaMapper historiaMapper = new HistoriaMapper();
     private final MedicoMapper medicoMapper = new MedicoMapper();
-    
+    private final TurnoMapper turnoMapper = new TurnoMapper();
     
 	@Override
 	public void registrarUsuario(String username, String password, String email, Integer rol)
@@ -85,52 +87,18 @@ public class PersistenceApi implements IApi {
 	    pacienteDao.create(paciente);
 	}
 	
-	
 	@Override
-	public void registrarTurno(MedicoDTO medico, TurnoDTO turno, PacienteDTO pacienteTurno)
-	        throws DataEmptyException {
+	public void registrarTurno(MedicoDTO medicoDTO, TurnoDTO turnoDTO, PacienteDTO pacienteDTO) throws DataEmptyException {
+	    Medico medico = medicoDao.find(medicoDTO.getMatricula());
+	    Paciente paciente = pacienteDao.find(pacienteDTO.getDni());
 
-	    if (medico == null || turno == null || pacienteTurno == null) {
-	        throw new IllegalArgumentException("Debe seleccionar un médico, un turno y un paciente.");
-	    }
-
-	    Turno turnoExistente = turnoDao.find(turno.getIdTurno());
-
-	    if (turnoExistente == null) {
-	        throw new IllegalArgumentException("El turno no existe.");
-	    }
-
-	    if (!turnoExistente.getFecha().isAfter(LocalDateTime.now())) {
-	        throw new IllegalArgumentException("El turno ya venció.");
-	    }
-	    Paciente paciente = pacienteDao.find(pacienteTurno.getDni());
-
-	    if (paciente == null) {
-	        throw new IllegalArgumentException("El paciente no existe.");
-	    }
-
-	    if (!turnoExistente.getMatriculaMedico().equals(medico.getMatricula())) {
-	        throw new IllegalArgumentException("El turno no pertenece al médico seleccionado.");
-	    }
-
-	    if (!turnoExistente.isActivo() || turnoExistente.getDniPaciente() != null) {
-	        throw new IllegalArgumentException("El turno ya no está disponible.");
-	    }
-
-	    turnoExistente.setDniPaciente(paciente.getDni());
-	    turnoExistente.setActivo(false);
-
-	    turnoDao.update(turnoExistente);
+	    Turno nuevoTurno = new Turno(0, turnoDTO.getFecha(), medico.getMatricula(), paciente.getDni(), false);
+	    turnoDao.create(nuevoTurno);
 	}
 	
 	@Override
-	public void liberarTurno(Integer idTurno) throws DataEmptyException {
-
-	    Turno turno = turnoDao.find(idTurno);
-	    turno.setDniPaciente(null);
-	    turno.setActivo(true);
-	    turno.setDetalle(null);
-	    turnoDao.update(turno);
+	public void liberarTurno(Integer idTurno) {
+	    turnoDao.remove(idTurno);
 	}
 	@Override
 	public void modificarPaciente(String nombre, String apellido, int dni, Integer obraSocial)
@@ -191,9 +159,8 @@ public class PersistenceApi implements IApi {
 	@Override
 	public List<TurnoDTO> obtenerHistoriaClinica(Paciente paciente) {
 	    List<Turno> turnos = turnoDao.findAll();
-	    List<Turno> historia = turnos.stream()
-	            .filter(t -> t.getDniPaciente() != null && t.getDniPaciente().equals(paciente.getDni()))
-	            .filter(t -> t.getFecha().isBefore(LocalDateTime.now())).collect(Collectors.toList());
+	    List<Turno> historia = turnos.stream().filter(t -> t.getDniPaciente() != null && t.getDniPaciente().equals(paciente.getDni()))
+	    .filter(t -> t.getFecha().isBefore(LocalDateTime.now())).collect(Collectors.toList());
 
 	    return historiaMapper.transformar(historia);
 	}
@@ -236,7 +203,7 @@ public class PersistenceApi implements IApi {
 
 	    List<TurnoDTO> historia = obtenerHistoriaClinica(paciente);
 
-	    return new PacienteDTO( paciente.getNombre(), paciente.getApellido(), paciente.getDni(), paciente.getObraSocial().getNombre(), historia);
+	    return pacienteMapper.transformar(paciente, historia);
 	}
 	
 	
@@ -299,8 +266,7 @@ public class PersistenceApi implements IApi {
 
 	    List<Paciente> pacientes = pacienteDao.findAll();
 
-	    return pacientes.stream().map(paciente -> new PacienteDTO(paciente.getNombre(),paciente.getApellido(),
-	           paciente.getDni(),paciente.getObraSocial().getNombre(),obtenerHistoriaClinica(paciente))).collect(Collectors.toList());
+	    return pacientes.stream().map(paciente -> pacienteMapper.transformar(paciente, obtenerHistoriaClinica(paciente))).collect(Collectors.toList());
 	}
 	
 	@Override
@@ -319,39 +285,37 @@ public class PersistenceApi implements IApi {
 		return false;
 	}
 	
+
 	@Override
-	public void generarTurnosSemanales() {
-		
-		turnoDao.eliminarTurnosDisponiblesVencidos();
+	public List<TurnoDTO> obtenerHorariosDisponibles(String matricula, LocalDate fecha) {
+	    Medico medico = medicoDao.find(matricula);
 
-	    List<Medico> medicos = medicoDao.findAll();
+	  
+	    List<Turno> horariosGenerados;
 
-	    for (Medico medico : medicos) {
+	    try {
+	        horariosGenerados = medico.generarTurnos(fecha);
+	    } catch (DataEmptyException e) {
+	        throw new OperationException("No se pudieron generar los horarios disponibles.");
+	    }
 
-	      
-	        List<Turno> turnosExistentes = turnoDao.findByMedico(medico.getMatricula());
+	    List<Turno> turnosRegistrados = turnoDao.findByMedicoYFecha(matricula, fecha);
 
-	        Set<LocalDateTime> fechasExistentes = new HashSet<>();
+	    Set<LocalDateTime> horariosOcupados = new HashSet<LocalDateTime>();
 
-	        for (Turno turno : turnosExistentes) {
-	            fechasExistentes.add(turno.getFecha());
-	        }
+	    for (Turno turno : turnosRegistrados) {
+	        horariosOcupados.add(turno.getFecha());
+	    }
 
-	        try {
-	           
-	            List<Turno> turnosGenerados = medico.generarTurnosSemanales();
+	    List<TurnoDTO> disponibles = new ArrayList<TurnoDTO>();
 
-	            for (Turno turno : turnosGenerados) {
-
-	              
-	                if (fechasExistentes.add(turno.getFecha())) {
-	                    turnoDao.create(turno);
-	                }
-	            }
-
-	        } catch (DataEmptyException e) {System.out.println("Error al generar turnos del médico " + medico.getMatricula() + ": " + e.getMessage());
+	    for (Turno turno : horariosGenerados) {
+	        if (!horariosOcupados.contains(turno.getFecha())) {
+	            disponibles.add(turnoMapper.transformar(turno));
 	        }
 	    }
+
+	    return disponibles;
 	}
 
 }

@@ -12,15 +12,7 @@ public class ConnectionManager {
 	protected static String pass = "";
 	protected static Connection conn = null;
 
-/*	public static void connect() {
-		try {
-			conn = DriverManager.getConnection(URL_DB + DB, user, pass);
-		} catch (SQLException sqlEx) {
-			System.out.println("No se ha podido conectar a " + URL_DB + DB + ". " + sqlEx.getMessage());
-			System.out.println("Error al cargar el driver");
-		}
-	}
-*/
+
 	
 
 	public static void connect() {

@@ -11,10 +11,11 @@ import java.awt.Insets;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -43,6 +44,8 @@ import ar.edu.unrn.seminario.dto.MedicoDTO;
 import ar.edu.unrn.seminario.dto.PacienteDTO;
 import ar.edu.unrn.seminario.dto.TurnoDTO;
 import ar.edu.unrn.seminario.exception.DataEmptyException;
+import ar.edu.unrn.seminario.exception.OperationException;
+import ar.edu.unrn.seminario.exception.PersistenceException;
 
 public class AltaTurno extends JPanel {
 
@@ -70,24 +73,19 @@ public class AltaTurno extends JPanel {
 
     private DateTimeFormatter formatoHora = DateTimeFormatter.ofPattern("HH:mm");
 
+    private boolean cargandoDatos;
+
     public AltaTurno(IApi api, JPanel panelContenedor, CardLayout cardLayout) {
-
         this.api = api;
-
-        pacientes = api.obtenerPacientes();
-        especialidades = api.obtenerEspecialidades();
-        medicos = api.obtenerMedicos();
 
         setLayout(new BorderLayout(10, 10));
         setBorder(new EmptyBorder(10, 20, 10, 20));
 
-       
         JLabel lblRegistrarTurno = new JLabel("Registrar Turno");
         lblRegistrarTurno.setHorizontalAlignment(SwingConstants.CENTER);
         lblRegistrarTurno.setFont(new Font("Tahoma", Font.BOLD | Font.ITALIC, 20));
         add(lblRegistrarTurno, BorderLayout.NORTH);
 
-       
         JPanel pForm = new JPanel(new GridBagLayout());
         add(pForm, BorderLayout.CENTER);
 
@@ -96,7 +94,6 @@ public class AltaTurno extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
 
-       
         JPanel panelPaciente = new JPanel(new GridBagLayout());
         panelPaciente.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del paciente"));
 
@@ -142,7 +139,6 @@ public class AltaTurno extends JPanel {
         gbcPaciente.gridy = 3;
         panelPaciente.add(cbPaciente, gbcPaciente);
 
-       
         JPanel panelMedico = new JPanel(new GridBagLayout());
         panelMedico.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del turno"));
 
@@ -160,7 +156,7 @@ public class AltaTurno extends JPanel {
         cbEspecialidad.setPreferredSize(new java.awt.Dimension(250, 30));
 
         cbEspecialidad.addActionListener(e -> {
-            if (cbEspecialidad.getSelectedItem() != null) {
+            if (!cargandoDatos && cbEspecialidad.getSelectedItem() != null) {
                 recargarMedicos(cbEspecialidad.getSelectedItem().toString());
             }
         });
@@ -176,6 +172,10 @@ public class AltaTurno extends JPanel {
         cbMedico.setPreferredSize(new java.awt.Dimension(250, 30));
 
         cbMedico.addActionListener(e -> {
+            if (cargandoDatos) {
+                return;
+            }
+
             int seleccionado = cbMedico.getSelectedIndex();
             turnoSeleccionado = null;
             modeloTurnos.setRowCount(0);
@@ -198,14 +198,15 @@ public class AltaTurno extends JPanel {
         calendario.setMinSelectableDate(new Date());
 
         calendario.addPropertyChangeListener("date", e -> {
-            turnoSeleccionado = null;
-            actualizarTablaTurnos();
+            if (!cargandoDatos) {
+                turnoSeleccionado = null;
+                actualizarTablaTurnos();
+            }
         });
 
         gbcMedico.gridy = 5;
         panelMedico.add(calendario, gbcMedico);
 
-       
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.weightx = 1.0;
@@ -216,11 +217,10 @@ public class AltaTurno extends JPanel {
         gbc.gridx = 1;
         pForm.add(panelMedico, gbc);
 
-        
         JPanel panelHorarios = new JPanel(new BorderLayout(5, 5));
         panelHorarios.setBorder(javax.swing.BorderFactory.createTitledBorder("Horarios disponibles"));
 
-        modeloTurnos = new DefaultTableModel(new Object[][] {}, new String[] { "Horario", "Disponibilidad" }) {
+        modeloTurnos = new DefaultTableModel(new Object[][] {}, new String[] { "Horario" }) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
@@ -256,17 +256,15 @@ public class AltaTurno extends JPanel {
         gbc.insets = new Insets(12, 12, 8, 12);
         pForm.add(panelHorarios, gbc);
 
-        // Botones inferiores
         JPanel pBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
 
         JButton btnRegistrar = new JButton("Registrar");
         btnRegistrar.addActionListener(e -> {
-
             int indiceMedico = cbMedico.getSelectedIndex();
             int indicePaciente = cbPaciente.getSelectedIndex();
 
-            if (indiceMedico < 0 || indicePaciente < 0 || turnoSeleccionado == null) {
-                JOptionPane.showMessageDialog(null, "Seleccione un médico, un paciente y un horario.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            if (turnoSeleccionado == null) {
+                JOptionPane.showMessageDialog(null, "Seleccione una fecha y un horario.", "Aviso", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
@@ -275,13 +273,12 @@ public class AltaTurno extends JPanel {
 
             try {
                 api.registrarTurno(medico, turnoSeleccionado, paciente);
-
                 JOptionPane.showMessageDialog(null, "Turno registrado con éxito.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-
                 cardLayout.show(panelContenedor, "PANELDEFAULT");
-
-            } catch (DataEmptyException | IllegalArgumentException ex) {
+            } catch (DataEmptyException ex) {
                 JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (PersistenceException ex) {
+                JOptionPane.showMessageDialog(null, ex.getMessage(), "Error de persistencia", JOptionPane.ERROR_MESSAGE);
             }
         });
 
@@ -293,7 +290,6 @@ public class AltaTurno extends JPanel {
 
         add(pBotones, BorderLayout.SOUTH);
 
-      
         this.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentShown(ComponentEvent e) {
@@ -303,54 +299,57 @@ public class AltaTurno extends JPanel {
     }
 
     private void cargarDatosIniciales() {
+        cargandoDatos = true;
 
-        pacientes = api.obtenerPacientes();
-        especialidades = api.obtenerEspecialidades();
-        medicos = api.obtenerMedicos();
+        try {
+            pacientes = api.obtenerPacientes();
+            especialidades = api.obtenerEspecialidades();
+            medicos = api.obtenerMedicos();
 
-        if (pacientes == null) pacientes = new ArrayList<>();
-        if (medicos == null) medicos = new ArrayList<>();
+            Collections.sort(pacientes, Comparator.comparing(PacienteDTO::getApellido, String.CASE_INSENSITIVE_ORDER).thenComparing(PacienteDTO::getNombre, String.CASE_INSENSITIVE_ORDER));
 
-        tfBuscarPaciente.setText("");
-        filtrarPacientes("");
+            tfBuscarPaciente.setText("");
+            filtrarPacientes("");
 
-        cbEspecialidad.removeAllItems();
+            cbEspecialidad.removeAllItems();
 
-        if (especialidades != null) {
             for (EspecialidadDTO especialidad : especialidades) {
                 cbEspecialidad.addItem(especialidad.getNombre());
             }
-        }
 
-        calendario.setDate(null);
-        modeloTurnos.setRowCount(0);
-        turnosFiltrados.clear();
-        turnoSeleccionado = null;
+            if (cbEspecialidad.getSelectedItem() != null) {
+                recargarMedicos(cbEspecialidad.getSelectedItem().toString());
+            }
+
+            calendario.setDate(null);
+            modeloTurnos.setRowCount(0);
+            turnosFiltrados.clear();
+            turnoSeleccionado = null;
+
+        } catch (PersistenceException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error de persistencia", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            cargandoDatos = false;
+        }
     }
 
     private void filtrarPacientes(String textoBusqueda) {
-
-        if (pacientes == null) pacientes = new ArrayList<>();
-
         String filtro = textoBusqueda == null ? "" : textoBusqueda.trim().toLowerCase();
 
-        pacientesFiltrados = pacientes.stream()
-                .filter(p -> {
-                    String nombreCompleto = (p.getNombre() + " " + p.getApellido()).toLowerCase();
-                    String apellidoNombre = (p.getApellido() + " " + p.getNombre()).toLowerCase();
-                    return nombreCompleto.contains(filtro) || apellidoNombre.contains(filtro);
-                })
-                .collect(Collectors.toList());
+        pacientesFiltrados = pacientes.stream().filter(p -> {
+            String nombreCompleto = (p.getNombre() + " " + p.getApellido()).toLowerCase();
+            String apellidoNombre = (p.getApellido() + " " + p.getNombre()).toLowerCase();
+            return nombreCompleto.contains(filtro) || apellidoNombre.contains(filtro);
+        }).collect(Collectors.toList());
 
         cbPaciente.removeAllItems();
 
         for (PacienteDTO paciente : pacientesFiltrados) {
-            cbPaciente.addItem(paciente.getNombre() + " " + paciente.getApellido());
+            cbPaciente.addItem(paciente.getApellido() + ", " + paciente.getNombre());
         }
     }
 
     private void actualizarTablaTurnos() {
-
         modeloTurnos.setRowCount(0);
         turnosFiltrados.clear();
         turnoSeleccionado = null;
@@ -358,34 +357,28 @@ public class AltaTurno extends JPanel {
         int indiceMedico = cbMedico.getSelectedIndex();
         Date fechaSeleccionada = calendario.getDate();
 
-        if (indiceMedico < 0 || fechaSeleccionada == null) return;
+        if (indiceMedico < 0 || indiceMedico >= medicosFiltrados.size() || fechaSeleccionada == null) {
+            return;
+        }
 
         MedicoDTO medico = medicosFiltrados.get(indiceMedico);
-
         LocalDate fecha = fechaSeleccionada.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        LocalDateTime ahora = LocalDateTime.now();
 
-        for (TurnoDTO turno : medico.getTurnosDisponibles()) {
+        try {
+            turnosFiltrados = api.obtenerHorariosDisponibles(medico.getMatricula(), fecha);
 
-            if (turno.isActivo() && turno.getFecha().toLocalDate().equals(fecha) && turno.getFecha().isAfter(ahora)) {
-
-                turnosFiltrados.add(turno);
-
-                modeloTurnos.addRow(new Object[] {
-                        turno.getFecha().format(formatoHora),
-                        "Disponible"
-                });
+            for (TurnoDTO turno : turnosFiltrados) {
+                modeloTurnos.addRow(new Object[] { turno.getFecha().format(formatoHora) });
             }
+        } catch (OperationException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (PersistenceException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error de persistencia", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void recargarMedicos(String especialidad) {
-
-        if (medicos == null) medicos = new ArrayList<>();
-
-        List<MedicoDTO> medicosEspecialidad = medicos.stream()
-                .filter(m -> m.getEspecialidad().getNombre().equals(especialidad))
-                .collect(Collectors.toList());
+        List<MedicoDTO> medicosEspecialidad = medicos.stream().filter(m -> m.getEspecialidad().getNombre().equals(especialidad)).collect(Collectors.toList());
 
         medicosFiltrados = medicosEspecialidad;
         cbMedico.removeAllItems();

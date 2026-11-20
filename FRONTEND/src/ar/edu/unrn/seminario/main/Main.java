@@ -17,7 +17,7 @@ public class Main {
 
 					IApi api = new PersistenceApi();
 					//VentanaPrincipal frame = new VentanaPrincipal(api);
-					api.generarTurnosSemanales();
+					
 					VentanaRecepcionista frame = new VentanaRecepcionista(api);
 
 					frame.setVisible(true);

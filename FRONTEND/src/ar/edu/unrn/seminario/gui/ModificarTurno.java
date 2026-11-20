@@ -9,7 +9,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -38,13 +37,14 @@ import ar.edu.unrn.seminario.dto.MedicoDTO;
 import ar.edu.unrn.seminario.dto.PacienteDTO;
 import ar.edu.unrn.seminario.dto.TurnoDTO;
 import ar.edu.unrn.seminario.exception.DataEmptyException;
+import ar.edu.unrn.seminario.exception.OperationException;
+import ar.edu.unrn.seminario.exception.PersistenceException;
 
 public class ModificarTurno extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
     private IApi api;
-
     private TurnoDTO turno;
 
     private Set<EspecialidadDTO> especialidades;
@@ -69,7 +69,6 @@ public class ModificarTurno extends JPanel {
     private boolean cargandoDatos = false;
 
     public ModificarTurno(IApi api, JPanel panelContenedor, CardLayout cardLayout) {
-
         this.api = api;
 
         setLayout(new BorderLayout(10, 10));
@@ -88,7 +87,6 @@ public class ModificarTurno extends JPanel {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
 
-        
         JPanel panelPaciente = new JPanel(new GridBagLayout());
         panelPaciente.setBorder(javax.swing.BorderFactory.createTitledBorder("Datos del turno actual"));
 
@@ -116,7 +114,6 @@ public class ModificarTurno extends JPanel {
         gbcPaciente.gridy = 3;
         panelPaciente.add(cbPaciente, gbcPaciente);
 
-        
         JPanel panelMedico = new JPanel(new GridBagLayout());
         panelMedico.setBorder(javax.swing.BorderFactory.createTitledBorder("Nuevo turno"));
 
@@ -131,6 +128,7 @@ public class ModificarTurno extends JPanel {
         panelMedico.add(lblEspecialidad, gbcMedico);
 
         cbEspecialidad = new JComboBox<>();
+        cbEspecialidad.setEnabled(false);
         cbEspecialidad.setPreferredSize(new java.awt.Dimension(250, 30));
 
         cbEspecialidad.addActionListener(e -> {
@@ -147,6 +145,7 @@ public class ModificarTurno extends JPanel {
         panelMedico.add(lblMedico, gbcMedico);
 
         cbMedico = new JComboBox<>();
+        cbMedico.setEnabled(false);
         cbMedico.setPreferredSize(new java.awt.Dimension(250, 30));
 
         cbMedico.addActionListener(e -> {
@@ -185,11 +184,10 @@ public class ModificarTurno extends JPanel {
         gbc.gridx = 1;
         pForm.add(panelMedico, gbc);
 
-        
         JPanel panelHorarios = new JPanel(new BorderLayout(5, 5));
         panelHorarios.setBorder(javax.swing.BorderFactory.createTitledBorder("Horarios disponibles"));
 
-        modeloTurnos = new DefaultTableModel(new Object[][] {}, new String[] { "Horario", "Disponibilidad" }) {
+        modeloTurnos = new DefaultTableModel(new Object[][] {}, new String[] { "Horario" }) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -227,7 +225,6 @@ public class ModificarTurno extends JPanel {
         gbc.insets = new Insets(12, 12, 8, 12);
         pForm.add(panelHorarios, gbc);
 
-        // Botones
         JPanel pBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 15, 10));
 
         JButton btnConfirmar = new JButton("Confirmar");
@@ -242,106 +239,79 @@ public class ModificarTurno extends JPanel {
     }
 
     public void datoTurnoActual(TurnoDTO turno) {
-
         this.turno = turno;
-
         cargarDatosIniciales();
     }
 
     private void cargarDatosIniciales() {
-
-        if (turno == null) {
-            return;
-        }
-
         cargandoDatos = true;
 
-        especialidades = api.obtenerEspecialidades();
-        medicos = api.obtenerMedicos();
+        try {
+            especialidades = api.obtenerEspecialidades();
+            medicos = api.obtenerMedicos();
 
-        if (especialidades == null) {
-            especialidades = new java.util.HashSet<>();
-        }
+            lblIdTurno.setText(String.valueOf(turno.getIdTurno()));
+            cbPaciente.removeAllItems();
 
-        if (medicos == null) {
-            medicos = new ArrayList<>();
-        }
-
-        lblIdTurno.setText(String.valueOf(turno.getIdTurno()));
-
-        cbPaciente.removeAllItems();
-
-        PacienteDTO paciente = api.obtenerPacientePorDni(turno.getPaciente());
-
-        if (paciente != null) {
+            PacienteDTO paciente = api.obtenerPacientePorDni(turno.getPaciente());
             cbPaciente.addItem(paciente.getNombre() + " " + paciente.getApellido());
-        }
 
-        cbEspecialidad.removeAllItems();
+            cbEspecialidad.removeAllItems();
 
-        for (EspecialidadDTO especialidad : especialidades) {
-            cbEspecialidad.addItem(especialidad.getNombre());
-        }
+            for (EspecialidadDTO especialidad : especialidades) {
+                cbEspecialidad.addItem(especialidad.getNombre());
+            }
 
-        MedicoDTO medicoActual = api.obtenerMedico(turno.getMatriculaMedico());
-
-        if (medicoActual != null) {
+            MedicoDTO medicoActual = api.obtenerMedico(turno.getMatriculaMedico());
             cbEspecialidad.setSelectedItem(medicoActual.getEspecialidad().getNombre());
-        }
 
-       
-        Date fechaOriginal = Date.from(turno.getFecha().atZone(ZoneId.systemDefault()).toInstant());
+            Date fechaOriginal = Date.from(turno.getFecha().atZone(ZoneId.systemDefault()).toInstant());
+            calendario.setDate(fechaOriginal);
 
-        calendario.setDate(fechaOriginal);
-
-        cargandoDatos = false;
-
-        if (medicoActual != null) {
             recargarMedicos(medicoActual.getMatricula());
+
+        } catch (PersistenceException e) {
+            JOptionPane.showMessageDialog(this, e.getMessage(), "Error de persistencia", JOptionPane.ERROR_MESSAGE);
+        } finally {
+            cargandoDatos = false;
         }
     }
 
     private void recargarMedicos(String matriculaSeleccionada) {
-
         cargandoDatos = true;
 
-        cbMedico.removeAllItems();
+        try {
+            cbMedico.removeAllItems();
+            modeloTurnos.setRowCount(0);
+            turnosFiltrados.clear();
+            turnoSeleccionado = null;
 
-        modeloTurnos.setRowCount(0);
-        turnosFiltrados.clear();
-        turnoSeleccionado = null;
+            String especialidad = (String) cbEspecialidad.getSelectedItem();
 
-        String especialidad = (String) cbEspecialidad.getSelectedItem();
+            medicosFiltrados = medicos.stream()
+                    .filter(m -> m.getEspecialidad().getNombre().equals(especialidad))
+                    .collect(Collectors.toList());
 
-        if (especialidad == null) {
-            cargandoDatos = false;
-            return;
-        }
+            for (MedicoDTO medico : medicosFiltrados) {
+                cbMedico.addItem(medico.getApellido() + ", " + medico.getNombre());
+            }
 
-        medicosFiltrados = medicos.stream()
-                .filter(m -> m.getEspecialidad().getNombre().equals(especialidad))
-                .collect(Collectors.toList());
-
-        for (MedicoDTO medico : medicosFiltrados) {
-            cbMedico.addItem(medico.getApellido() + ", " + medico.getNombre());
-        }
-
-        if (matriculaSeleccionada != null) {
-            for (int i = 0; i < medicosFiltrados.size(); i++) {
-                if (medicosFiltrados.get(i).getMatricula().equals(matriculaSeleccionada)) {
-                    cbMedico.setSelectedIndex(i);
-                    break;
+            if (matriculaSeleccionada != null) {
+                for (int i = 0; i < medicosFiltrados.size(); i++) {
+                    if (medicosFiltrados.get(i).getMatricula().equals(matriculaSeleccionada)) {
+                        cbMedico.setSelectedIndex(i);
+                        break;
+                    }
                 }
             }
+        } finally {
+            cargandoDatos = false;
         }
-
-        cargandoDatos = false;
 
         actualizarTablaTurnos();
     }
 
     private void actualizarTablaTurnos() {
-
         modeloTurnos.setRowCount(0);
         turnosFiltrados.clear();
         turnoSeleccionado = null;
@@ -354,60 +324,44 @@ public class ModificarTurno extends JPanel {
         }
 
         MedicoDTO medico = medicosFiltrados.get(indiceMedico);
+        LocalDate fecha = fechaSeleccionada.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
-        LocalDate fecha = fechaSeleccionada.toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate();
+        try {
+            turnosFiltrados = api.obtenerHorariosDisponibles(medico.getMatricula(), fecha);
 
-        LocalDateTime ahora = LocalDateTime.now();
-
-        for (TurnoDTO t : medico.getTurnosDisponibles()) {
-
-            if (t.isActivo()
-                    && t.getFecha().toLocalDate().equals(fecha)
-                    && t.getFecha().isAfter(ahora)) {
-
-                turnosFiltrados.add(t);
-
-                modeloTurnos.addRow(new Object[] {
-                        t.getFecha().format(formatoHora),
-                        "Disponible"
-                });
+            for (TurnoDTO t : turnosFiltrados) {
+                modeloTurnos.addRow(new Object[] { t.getFecha().format(formatoHora) });
             }
+        } catch (OperationException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (PersistenceException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Error de persistencia", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     private void confirmarModificacion(CardLayout cardLayout, JPanel panelContenedor) {
-
         int indiceMedico = cbMedico.getSelectedIndex();
 
         if (indiceMedico < 0 || turnoSeleccionado == null) {
-            JOptionPane.showMessageDialog(null, "Seleccione un médico y un horario disponible.", "Aviso", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        if (turnoSeleccionado.getIdTurno() == turno.getIdTurno()) {
-            JOptionPane.showMessageDialog(null, "Seleccione un horario diferente al turno actual.", "Aviso", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Seleccione un horario disponible.", "Aviso", JOptionPane.WARNING_MESSAGE);
             return;
         }
 
         MedicoDTO medicoNuevo = medicosFiltrados.get(indiceMedico);
 
-        PacienteDTO paciente = api.obtenerPacientePorDni(turno.getPaciente());
-
         try {
+            PacienteDTO paciente = api.obtenerPacientePorDni(turno.getPaciente());
 
             api.registrarTurno(medicoNuevo, turnoSeleccionado, paciente);
-
             api.liberarTurno(turno.getIdTurno());
 
             JOptionPane.showMessageDialog(null, "Turno modificado con éxito.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-
             cardLayout.show(panelContenedor, "LISTADOTURNO");
 
-        } catch (DataEmptyException | IllegalArgumentException ex) {
-
+        } catch (DataEmptyException ex) {
             JOptionPane.showMessageDialog(null, ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (PersistenceException ex) {
+            JOptionPane.showMessageDialog(null, ex.getMessage(), "Error de persistencia", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

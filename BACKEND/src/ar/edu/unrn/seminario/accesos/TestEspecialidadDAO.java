@@ -12,8 +12,7 @@ public class TestEspecialidadDAO {
         try {
 
             // CREAR
-            Especialidad especialidad =
-                    new Especialidad(4, "Especialidad de prueba");
+            Especialidad especialidad = new Especialidad(4, "Especialidad de prueba");
 
             especialidadDAO.create(especialidad);
 

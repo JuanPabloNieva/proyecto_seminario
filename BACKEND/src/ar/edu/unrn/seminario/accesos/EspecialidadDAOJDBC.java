@@ -8,140 +8,130 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import ar.edu.unrn.seminario.exception.PersistenceException;
 import ar.edu.unrn.seminario.modelo.Especialidad;
 
 public class EspecialidadDAOJDBC implements EspecialidadDao {
 
     @Override
     public void create(Especialidad especialidad) {
-
-        String sql = "INSERT INTO especialidades " + "(codigo, nombre, descripcion, activo) " + "VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO especialidades (codigo, nombre, descripcion, activo) VALUES (?, ?, ?, ?)";
 
         try {
             Connection conn = ConnectionManager.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
 
-            ps.setInt(1, especialidad.getCodigo());
-            ps.setString(2, especialidad.getNombre());
-            ps.setString(3, especialidad.getDescripcion());
-            ps.setBoolean(4, especialidad.isActivo());
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, especialidad.getCodigo());
+                ps.setString(2, especialidad.getNombre());
+                ps.setString(3, especialidad.getDescripcion());
+                ps.setBoolean(4, especialidad.isActivo());
 
-            ps.executeUpdate();
-            ps.close();
+                ps.executeUpdate();
+            }
 
         } catch (SQLException e) {
-            throw new RuntimeException(
-                    "Error al registrar la especialidad", e);
+            throw new PersistenceException("Error al registrar la especialidad", e);
+        } finally {
+            ConnectionManager.disconnect();
         }
     }
 
     @Override
     public void update(Especialidad especialidad) {
-
-        String sql = "UPDATE especialidades SET nombre = ?, " + "descripcion = ?, activo = ? WHERE codigo = ?";
+        String sql = "UPDATE especialidades SET nombre = ?, descripcion = ?, activo = ? WHERE codigo = ?";
 
         try {
             Connection conn = ConnectionManager.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
 
-            ps.setString(1, especialidad.getNombre());
-            ps.setString(2, especialidad.getDescripcion());
-            ps.setBoolean(3, especialidad.isActivo());
-            ps.setInt(4, especialidad.getCodigo());
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setString(1, especialidad.getNombre());
+                ps.setString(2, especialidad.getDescripcion());
+                ps.setBoolean(3, especialidad.isActivo());
+                ps.setInt(4, especialidad.getCodigo());
 
-            ps.executeUpdate();
-            ps.close();
+                ps.executeUpdate();
+            }
 
         } catch (SQLException e) {
-            throw new RuntimeException(
-                    "Error al modificar la especialidad", e);
+            throw new PersistenceException("Error al modificar la especialidad", e);
+        } finally {
+            ConnectionManager.disconnect();
         }
     }
 
     @Override
     public void remove(Integer codigo) {
-
         String sql = "DELETE FROM especialidades WHERE codigo = ?";
 
         try {
             Connection conn = ConnectionManager.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
 
-            ps.setInt(1, codigo);
-
-            ps.executeUpdate();
-            ps.close();
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, codigo);
+                ps.executeUpdate();
+            }
 
         } catch (SQLException e) {
-            throw new RuntimeException(
-                    "Error al eliminar la especialidad", e);
+            throw new PersistenceException("Error al eliminar la especialidad", e);
+        } finally {
+            ConnectionManager.disconnect();
         }
     }
 
     @Override
     public Especialidad find(Integer codigo) {
-
         String sql = "SELECT * FROM especialidades WHERE codigo = ?";
 
         try {
             Connection conn = ConnectionManager.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
-
-            ps.setInt(1, codigo);
-
-            ResultSet rs = ps.executeQuery();
-
             Especialidad especialidad = null;
 
-            if (rs.next()) {
-                especialidad = mapearEspecialidad(rs);
-            }
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, codigo);
 
-            rs.close();
-            ps.close();
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        especialidad = mapearEspecialidad(rs);
+                    }
+                }
+            }
 
             return especialidad;
 
         } catch (SQLException e) {
-            throw new RuntimeException(
-                    "Error al buscar la especialidad", e);
+            throw new PersistenceException("Error al buscar la especialidad", e);
+        } finally {
+            ConnectionManager.disconnect();
         }
     }
 
     @Override
     public List<Especialidad> findAll() {
-
-        List<Especialidad> especialidades = new ArrayList<>();
-
+        List<Especialidad> especialidades = new ArrayList<Especialidad>();
         String sql = "SELECT * FROM especialidades";
 
         try {
             Connection conn = ConnectionManager.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql);
 
-            ResultSet rs = ps.executeQuery();
+            try (PreparedStatement ps = conn.prepareStatement(sql);
+                 ResultSet rs = ps.executeQuery()) {
 
-            while (rs.next()) {
-                especialidades.add(mapearEspecialidad(rs));
+                while (rs.next()) {
+                    especialidades.add(mapearEspecialidad(rs));
+                }
             }
 
-            rs.close();
-            ps.close();
-
         } catch (SQLException e) {
-            throw new RuntimeException("Error al listar las especialidades", e);
+            throw new PersistenceException("Error al listar las especialidades", e);
+        } finally {
+            ConnectionManager.disconnect();
         }
 
         return especialidades;
     }
 
-    private Especialidad mapearEspecialidad(ResultSet rs)
-            throws SQLException {
-
-        Especialidad especialidad = new Especialidad(
-                rs.getInt("codigo"),
-                rs.getString("nombre")
-        );
+    private Especialidad mapearEspecialidad(ResultSet rs) throws SQLException {
+        Especialidad especialidad = new Especialidad(rs.getInt("codigo"), rs.getString("nombre"));
 
         especialidad.setDescripcion(rs.getString("descripcion"));
         especialidad.setActivo(rs.getBoolean("activo"));

@@ -16,6 +16,8 @@ import ar.edu.unrn.seminario.modelo.Medico;
 import ar.edu.unrn.seminario.modelo.Paciente;
 import ar.edu.unrn.seminario.modelo.Turno;
 import ar.edu.unrn.seminario.modelo.Usuario;
+import java.time.LocalDate;
+import java.util.List;
 
 public interface IApi {
 
@@ -78,5 +80,7 @@ public interface IApi {
 
 	boolean autenticar(String username, String password);
 	
-	public void generarTurnosSemanales() throws DataEmptyException;
+	
+	
+	List<TurnoDTO> obtenerHorariosDisponibles(String matricula, LocalDate fecha);
 }
